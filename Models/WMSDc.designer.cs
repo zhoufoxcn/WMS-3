@@ -222,6 +222,9 @@ namespace WMS.Models
     partial void Insertwms_blldtl(wms_blldtl instance);
     partial void Updatewms_blldtl(wms_blldtl instance);
     partial void Deletewms_blldtl(wms_blldtl instance);
+    partial void Insertwms_pkgbcd(wms_pkgbcd instance);
+    partial void Updatewms_pkgbcd(wms_pkgbcd instance);
+    partial void Deletewms_pkgbcd(wms_pkgbcd instance);
     #endregion
 		
 		public WMSDcDataContext() : 
@@ -779,6 +782,14 @@ namespace WMS.Models
 			get
 			{
 				return this.GetTable<wms_blldtl>();
+			}
+		}
+		
+		public System.Data.Linq.Table<wms_pkgbcd> wms_pkgbcd
+		{
+			get
+			{
+				return this.GetTable<wms_pkgbcd>();
 			}
 		}
 		
@@ -29378,6 +29389,140 @@ namespace WMS.Models
 					this._brief = value;
 					this.SendPropertyChanged("brief");
 					this.OnbriefChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.wms_pkgbcd")]
+	public partial class wms_pkgbcd : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private string _gdsid;
+		
+		private string _pkgbcd;
+		
+		private string _uptpsn;
+		
+		private string _udtdtm;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OngdsidChanging(string value);
+    partial void OngdsidChanged();
+    partial void OnpkgbcdChanging(string value);
+    partial void OnpkgbcdChanged();
+    partial void OnuptpsnChanging(string value);
+    partial void OnuptpsnChanged();
+    partial void OnudtdtmChanging(string value);
+    partial void OnudtdtmChanged();
+    #endregion
+		
+		public wms_pkgbcd()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_gdsid", DbType="Char(13) NOT NULL", CanBeNull=false)]
+		public string gdsid
+		{
+			get
+			{
+				return this._gdsid;
+			}
+			set
+			{
+				if ((this._gdsid != value))
+				{
+					this.OngdsidChanging(value);
+					this.SendPropertyChanging();
+					this._gdsid = value;
+					this.SendPropertyChanged("gdsid");
+					this.OngdsidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgbcd", DbType="VarChar(40) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		public string pkgbcd
+		{
+			get
+			{
+				return this._pkgbcd;
+			}
+			set
+			{
+				if ((this._pkgbcd != value))
+				{
+					this.OnpkgbcdChanging(value);
+					this.SendPropertyChanging();
+					this._pkgbcd = value;
+					this.SendPropertyChanged("pkgbcd");
+					this.OnpkgbcdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_uptpsn", DbType="Char(6)")]
+		public string uptpsn
+		{
+			get
+			{
+				return this._uptpsn;
+			}
+			set
+			{
+				if ((this._uptpsn != value))
+				{
+					this.OnuptpsnChanging(value);
+					this.SendPropertyChanging();
+					this._uptpsn = value;
+					this.SendPropertyChanged("uptpsn");
+					this.OnuptpsnChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_udtdtm", DbType="Char(14)")]
+		public string udtdtm
+		{
+			get
+			{
+				return this._udtdtm;
+			}
+			set
+			{
+				if ((this._udtdtm != value))
+				{
+					this.OnudtdtmChanging(value);
+					this.SendPropertyChanging();
+					this._udtdtm = value;
+					this.SendPropertyChanged("udtdtm");
+					this.OnudtdtmChanged();
 				}
 			}
 		}

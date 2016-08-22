@@ -93,6 +93,7 @@
     <Compile Include="Controllers\HqApkServicesController.cs" />
     <Compile Include="Controllers\InvCkController.cs" />
     <Compile Include="Controllers\OverQuAdjustBarcodeController.cs" />
+    <Compile Include="Controllers\PkgBcdController.cs" />
     <Compile Include="Controllers\ProfitOrLossController.cs" />
     <Compile Include="Controllers\RecievOneByOneController.cs" />
     <Compile Include="Controllers\RetCangController.cs" />

@@ -382,7 +382,7 @@ namespace WMS.Controllers
                 {
                     p += k + Request[k] + "&";
                 }
-                i(wmsno, WMSConst.BLL_TYPE_RETRIEVE, p, "N0171", "", LoginInfo.DefSavdptid);
+                //i(wmsno, WMSConst.BLL_TYPE_RETRIEVE, p, "N0171", "", LoginInfo.DefSavdptid);
 
                 return RNoData("N0171");        // 该拣货单未找到符合条件的明细信息
             }

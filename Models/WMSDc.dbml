@@ -1351,6 +1351,14 @@
       <Column Name="brief" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
+  <Table Name="dbo.wms_pkgbcd" Member="wms_pkgbcd">
+    <Type Name="wms_pkgbcd">
+      <Column Name="gdsid" Type="System.String" DbType="Char(13) NOT NULL" CanBeNull="false" />
+      <Column Name="pkgbcd" Type="System.String" DbType="VarChar(40) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="uptpsn" Type="System.String" DbType="Char(6)" CanBeNull="true" />
+      <Column Name="udtdtm" Type="System.String" DbType="Char(14)" CanBeNull="true" />
+    </Type>
+  </Table>
   <Function Name="dbo.fnGetBigProLssBll" Method="fnGetBigProLssBll" IsComposable="true">
     <Parameter Name="savdptid" Type="System.String" DbType="VarChar(8)" />
     <Parameter Name="dptid" Type="System.String" DbType="VarChar(8)" />

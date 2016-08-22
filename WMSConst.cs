@@ -370,6 +370,7 @@ namespace WMS
         public const String WMS_BACK_库存报表查询 = "9903";
         public const String WMS_BACK_监控报表查询 = "9904";
         public const String WMS_BACK_报表转存 = "9905";
+        public const String WMS_BACK_箱装码维护 = "9101";
         #endregion
     }
     

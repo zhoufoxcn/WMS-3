@@ -324,6 +324,7 @@ namespace WMS.Controllers
 
         public GdsInBarcode[] GetAGdsQtyInBarcodeComm(String barcode, String gdsid, String gdstype)
         {
+            gdsid = GetGdsidByGdsidOrBcd(gdsid);
             var qry = from e in WmsDc.wms_cwgdsbs
                       join e1 in WmsDc.gds on e.gdsid equals e1.gdsid
                       join e2 in WmsDc.bcd on new { e.gdsid, e.bcd } equals new { e2.gdsid, bcd = e2.bcd1 }
@@ -551,6 +552,7 @@ namespace WMS.Controllers
                        };
             if (!string.IsNullOrEmpty(gdsid))
             {
+                gdsid = GetGdsidByGdsidOrBcd(gdsid);
                 qry1 = qry1.Where(e => e.gdsid == gdsid).Select(e=>e);
             }
 
@@ -2851,9 +2853,12 @@ namespace WMS.Controllers
         {
             var qry = from e in WmsDc.gds
                       join e1 in WmsDc.bcd on e.gdsid equals e1.gdsid
-                      into joinBcdDefault
+                      into joinBcdDefault                      
                       from e2 in joinBcdDefault.DefaultIfEmpty()
-                      where (e.gdsid == gdsid || e2.bcd1 == gdsid)
+                      join e3 in WmsDc.wms_pkgbcd on e.gdsid equals e3.gdsid
+                      into joinPkgbcd
+                      from e4 in joinPkgbcd.DefaultIfEmpty()
+                      where (e.gdsid == gdsid || e2.bcd1 == gdsid || e4.pkgbcd == gdsid)
                       //&& dpts.Contains(e.dptid.Trim())
                       select e;
             var arrqry = qry.ToArray();

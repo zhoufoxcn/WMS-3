@@ -99,12 +99,12 @@ namespace WMS.Controllers
                     dtl.vlddat = string.IsNullOrEmpty(vlddat[i]) ? "1" : vlddat[i];
                     JsonResult jr = (JsonResult)GetBcdByGdsid(gdsid[i]);
                     ResultMessage rm = (ResultMessage)jr.Data;
-                    if (rm.ResultCode != ResultMessage.RESULTMESSAGE_SUCCESS)
+                    /*if (rm.ResultCode != ResultMessage.RESULTMESSAGE_SUCCESS)
                     {
                         return RInfo( "I0334",gdsid[i] );
-                    }
-                    bcd[] b = (bcd[])rm.ResultObject;
-                    dtl.bcd = b[0].bcd1;                    
+                    }*/
+                    bcd b = (rm.ResultObject==null?null:((bcd[])rm.ResultObject).FirstOrDefault());
+                    dtl.bcd = b==null? null : b.bcd1;                    
                     dtl.bkr = "";
                     dtl.bokflg = GetN();
                     dtl.bokdat = GetCurrentDate();
@@ -787,12 +787,12 @@ namespace WMS.Controllers
             dtl.vlddat = string.IsNullOrEmpty(vlddat.Trim()) ? GetCurrentDay() : vlddat.Trim();
             JsonResult jr = (JsonResult)GetBcdByGdsid(gdsid);
             ResultMessage rm = (ResultMessage)jr.Data;
-            if (rm.ResultCode != ResultMessage.RESULTMESSAGE_SUCCESS)
+            /*if (rm.ResultCode != ResultMessage.RESULTMESSAGE_SUCCESS)
             {
                 return RInfo( "I0359",gdsid );
-            }
-            bcd[] b = (bcd[])rm.ResultObject;
-            dtl.bcd = b[0].bcd1;
+            }*/
+            bcd b = rm.ResultObject==null ? null : ((bcd[])rm.ResultObject).FirstOrDefault();
+            dtl.bcd = b==null ? null : b.bcd1;
             dtl.bkr = "";
             dtl.bokflg = GetN();
             dtl.bokdat = GetCurrentDate();

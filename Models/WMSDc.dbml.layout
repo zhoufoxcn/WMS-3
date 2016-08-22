@@ -228,7 +228,7 @@
         <classShapeMoniker Id="377f6d66-1e64-4fdd-9ff0-3b9acad19f88" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(5.75 : 8.25361755371094); (6.5 : 8.25361755371094)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(5.75 : 8.25361755371094); (6.5 : 8.25361755371094)]" fixedFrom="Algorithm" fixedTo="Algorithm">
       <AssociationMoniker Name="/WMSDcDataContext/stkin/stkin_stkindtl" />
       <nodes>
         <classShapeMoniker Id="88e1ccc3-c496-45b4-af8e-f8c6c0164466" />
@@ -438,6 +438,12 @@
       <DataClassMoniker Name="/WMSDcDataContext/wms_blldtl" />
       <nestedChildShapes>
         <elementListCompartment Id="6233be8a-13de-470a-a659-3ba2fe4908f4" absoluteBounds="15.39, 7.21, 1.9700000000000002, 3.494801839192708" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="ba5431be-17e6-4e36-825c-b6ddd5eec6f9" absoluteBounds="7, 6.125, 2, 1.5715458170572916">
+      <DataClassMoniker Name="/WMSDcDataContext/wms_pkgbcd" />
+      <nestedChildShapes>
+        <elementListCompartment Id="d76c799b-f19f-4e17-9268-2aff30e567ba" absoluteBounds="7.015, 6.585, 1.9700000000000002, 1.0115458170572915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
   </nestedChildShapes>

@@ -266,7 +266,7 @@ namespace WMS.Controllers
                       };
             LoginInfo li = null;
             var arrqry = qry.ToArray();
-            if (arrqry.Length >= 0)
+            if (arrqry.Length > 0)
             {
                 li = arrqry[0];                
             }
@@ -365,10 +365,16 @@ namespace WMS.Controllers
                 Rm.ResultCode = ResultMessage.RESULTMESSAGE_INFO;
                 Rm.ResultDesc = "登录失败，用户名或密码错误！";
                 return this.ReturnResult();
-            }
+            }            
 
             Session["usrid"] = arrqry[0].empid.Trim();
-            UsrId = (String)Session["usrid"];            
+            UsrId = (String)Session["usrid"];
+
+            if (arrqry[0].isstp == GetY())
+            {
+                return RInfo("I0506");
+            }
+
             //得到用户信息
             LoginInfo = GetLoginInfoByUsrId(usrid);
             //设置默认配送信息 

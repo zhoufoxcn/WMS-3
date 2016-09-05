@@ -607,7 +607,7 @@ namespace WMS.Controllers
                                         where e.stkot.wmsbllid == cutgds.bllid
                                         && e.stkot.wmsno == cutgds.wmsno
                                         && e.gdsid == cutgds.gdsid
-                                        orderby e.qty descending
+                                        orderby Convert.ToInt32(e.stkot.rcvdptid) descending, e.qty descending
                                         select e;
                         double q = qrystkdtl.Sum(e => e.qty) - cutgds.qty;
 

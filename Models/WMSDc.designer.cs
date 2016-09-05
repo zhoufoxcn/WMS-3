@@ -834,6 +834,14 @@ namespace WMS.Models
 			bllno = ((string)(result.GetParameterValue(3)));
 			return ((ISingleResult<get_bllnoResult>)(result.ReturnValue));
 		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.get_wms_gds")]
+		public int get_wms_gds([global::System.Data.Linq.Mapping.ParameterAttribute(DbType="VarChar(30)")] string bcd, [global::System.Data.Linq.Mapping.ParameterAttribute(DbType="VarChar(20)")] ref string gdsid)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), bcd, gdsid);
+			gdsid = ((string)(result.GetParameterValue(1)));
+			return ((int)(result.ReturnValue));
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.wms_bzmst")]
@@ -9992,7 +10000,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_depid", DbType="Char(6)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_depid", DbType="Char(6)", UpdateCheck=UpdateCheck.Never)]
 		public string depid
 		{
 			get
@@ -10012,7 +10020,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_indepid", DbType="Char(6)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_indepid", DbType="Char(6)", UpdateCheck=UpdateCheck.Never)]
 		public string indepid
 		{
 			get
@@ -10032,7 +10040,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_gdsid", DbType="Char(13) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_gdsid", DbType="Char(13) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
 		public string gdsid
 		{
 			get
@@ -10052,7 +10060,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgid", DbType="Char(2) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgid", DbType="Char(2) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
 		public string pkgid
 		{
 			get
@@ -10072,7 +10080,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgqty", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgqty", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> pkgqty
 		{
 			get
@@ -10092,7 +10100,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgprc", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgprc", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> pkgprc
 		{
 			get
@@ -10112,7 +10120,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgsalprc", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pkgsalprc", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> pkgsalprc
 		{
 			get
@@ -10152,7 +10160,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_prc", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_prc", DbType="Float NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		public double prc
 		{
 			get
@@ -10172,7 +10180,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_dct", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_dct", DbType="Float NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		public double dct
 		{
 			get
@@ -10192,7 +10200,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_amt", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_amt", DbType="Float NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		public double amt
 		{
 			get
@@ -10212,7 +10220,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_taxprc", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_taxprc", DbType="Float NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		public double taxprc
 		{
 			get
@@ -10232,7 +10240,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_taxrto", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_taxrto", DbType="Float NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		public double taxrto
 		{
 			get
@@ -10252,7 +10260,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_taxamt", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_taxamt", DbType="Float NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		public double taxamt
 		{
 			get
@@ -10272,7 +10280,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_patamt", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_patamt", DbType="Float NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		public double patamt
 		{
 			get
@@ -10292,7 +10300,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_salprc", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_salprc", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> salprc
 		{
 			get
@@ -10312,7 +10320,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_salamt", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_salamt", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> salamt
 		{
 			get
@@ -10332,7 +10340,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_orisalprc", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_orisalprc", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> orisalprc
 		{
 			get
@@ -10352,7 +10360,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mctortrust", DbType="Char(1)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mctortrust", DbType="Char(1)", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<char> mctortrust
 		{
 			get
@@ -10372,7 +10380,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_prvid", DbType="Char(6)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_prvid", DbType="Char(6)", UpdateCheck=UpdateCheck.Never)]
 		public string prvid
 		{
 			get
@@ -10392,7 +10400,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bthprc", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bthprc", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> bthprc
 		{
 			get
@@ -10412,7 +10420,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vlddat", DbType="Char(8)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vlddat", DbType="Char(8)", UpdateCheck=UpdateCheck.Never)]
 		public string vlddat
 		{
 			get
@@ -10432,7 +10440,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bcd", DbType="Char(13)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bcd", DbType="Char(13)", UpdateCheck=UpdateCheck.Never)]
 		public string bcd
 		{
 			get
@@ -10452,7 +10460,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_stotcstprc", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_stotcstprc", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> stotcstprc
 		{
 			get
@@ -10472,7 +10480,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_stotcstamt", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_stotcstamt", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> stotcstamt
 		{
 			get
@@ -10492,7 +10500,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_prccls", DbType="Char(1)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_prccls", DbType="Char(1)", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<char> prccls
 		{
 			get
@@ -10512,7 +10520,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_brfdtl", DbType="VarChar(40)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_brfdtl", DbType="VarChar(40)", UpdateCheck=UpdateCheck.Never)]
 		public string brfdtl
 		{
 			get
@@ -10532,7 +10540,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_preqty", DbType="Float")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_preqty", DbType="Float", UpdateCheck=UpdateCheck.Never)]
 		public System.Nullable<double> preqty
 		{
 			get
@@ -10572,7 +10580,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bzr", DbType="Char(6)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bzr", DbType="Char(6)", UpdateCheck=UpdateCheck.Never)]
 		public string bzr
 		{
 			get
@@ -10592,7 +10600,7 @@ namespace WMS.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bzdat", DbType="VarChar(14)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bzdat", DbType="VarChar(14)", UpdateCheck=UpdateCheck.Never)]
 		public string bzdat
 		{
 			get
@@ -21182,7 +21190,7 @@ namespace WMS.Models
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.view_pssndgds")]
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.view_pssndgds2")]
 	public partial class view_pssndgds
 	{
 		

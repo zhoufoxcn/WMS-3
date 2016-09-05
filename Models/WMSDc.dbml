@@ -425,37 +425,37 @@
     <Type Name="stkotdtl">
       <Column Name="stkouno" Type="System.String" DbType="Char(14) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="rcdidx" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="depid" Type="System.String" DbType="Char(6)" CanBeNull="true" />
-      <Column Name="indepid" Type="System.String" DbType="Char(6)" CanBeNull="true" />
-      <Column Name="gdsid" Type="System.String" DbType="Char(13) NOT NULL" CanBeNull="false" />
-      <Column Name="pkgid" Type="System.String" DbType="Char(2) NOT NULL" CanBeNull="false" />
-      <Column Name="pkgqty" Type="System.Double" DbType="Float" CanBeNull="true" />
-      <Column Name="pkgprc" Type="System.Double" DbType="Float" CanBeNull="true" />
-      <Column Name="pkgsalprc" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="depid" Type="System.String" DbType="Char(6)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="indepid" Type="System.String" DbType="Char(6)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="gdsid" Type="System.String" DbType="Char(13) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="pkgid" Type="System.String" DbType="Char(2) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="pkgqty" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="pkgprc" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="pkgsalprc" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="qty" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
-      <Column Name="prc" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
-      <Column Name="dct" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
-      <Column Name="amt" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
-      <Column Name="taxprc" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
-      <Column Name="taxrto" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
-      <Column Name="taxamt" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
-      <Column Name="patamt" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
-      <Column Name="salprc" Type="System.Double" DbType="Float" CanBeNull="true" />
-      <Column Name="salamt" Type="System.Double" DbType="Float" CanBeNull="true" />
-      <Column Name="orisalprc" Type="System.Double" DbType="Float" CanBeNull="true" />
-      <Column Name="mctortrust" Type="System.Char" DbType="Char(1)" CanBeNull="true" />
-      <Column Name="prvid" Type="System.String" DbType="Char(6)" CanBeNull="true" />
-      <Column Name="bthprc" Type="System.Double" DbType="Float" CanBeNull="true" />
-      <Column Name="vlddat" Type="System.String" DbType="Char(8)" CanBeNull="true" />
-      <Column Name="bcd" Type="System.String" DbType="Char(13)" CanBeNull="true" />
-      <Column Name="stotcstprc" Type="System.Double" DbType="Float" CanBeNull="true" />
-      <Column Name="stotcstamt" Type="System.Double" DbType="Float" CanBeNull="true" />
-      <Column Name="prccls" Type="System.Char" DbType="Char(1)" CanBeNull="true" />
-      <Column Name="brfdtl" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
-      <Column Name="preqty" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="prc" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="dct" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="amt" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="taxprc" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="taxrto" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="taxamt" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="patamt" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="salprc" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="salamt" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="orisalprc" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="mctortrust" Type="System.Char" DbType="Char(1)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="prvid" Type="System.String" DbType="Char(6)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="bthprc" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="vlddat" Type="System.String" DbType="Char(8)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="bcd" Type="System.String" DbType="Char(13)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="stotcstprc" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="stotcstamt" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="prccls" Type="System.Char" DbType="Char(1)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="brfdtl" Type="System.String" DbType="VarChar(40)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="preqty" Type="System.Double" DbType="Float" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="bzflg" Type="System.Char" DbType="Char(1)" CanBeNull="true" />
-      <Column Name="bzr" Type="System.String" DbType="Char(6)" CanBeNull="true" />
-      <Column Name="bzdat" Type="System.String" DbType="VarChar(14)" CanBeNull="true" />
+      <Column Name="bzr" Type="System.String" DbType="Char(6)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="bzdat" Type="System.String" DbType="VarChar(14)" CanBeNull="true" UpdateCheck="Never" />
       <Association Name="stkot_stkotdtl" Member="stkot" AccessModifier="Internal" ThisKey="stkouno" OtherKey="stkouno" Type="stkot" IsForeignKey="true" />
     </Type>
   </Table>
@@ -961,7 +961,7 @@
       <Column Name="qu" Type="System.String" DbType="VarChar(2)" CanBeNull="true" />
     </Type>
   </Table>
-  <Table Name="dbo.view_pssndgds" Member="view_pssndgds">
+  <Table Name="dbo.view_pssndgds2" Member="view_pssndgds">
     <Type Name="view_pssndgds">
       <Column Name="dh" Type="System.String" DbType="Char(16) NOT NULL" CanBeNull="false" />
       <Column Name="dqdes" Type="System.String" DbType="Char(100) NOT NULL" CanBeNull="false" />
@@ -1408,5 +1408,10 @@
     <ElementType Name="get_bllnoResult">
       <Column Name="bllno" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
     </ElementType>
+  </Function>
+  <Function Name="dbo.get_wms_gds" Method="get_wms_gds">
+    <Parameter Name="bcd" Type="System.String" DbType="VarChar(30)" />
+    <Parameter Name="gdsid" Type="System.String" DbType="VarChar(20)" Direction="InOut" />
+    <Return Type="System.Int32" />
   </Function>
 </Database>

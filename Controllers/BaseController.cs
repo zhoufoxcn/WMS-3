@@ -9,6 +9,8 @@ using WMS;
 using WMS.Common;
 using System.Transactions;
 using System.Web.Script.Serialization;
+using System.IO;
+using System.Text;
 
 namespace WMS.Controllers
 {
@@ -18,9 +20,16 @@ namespace WMS.Controllers
     [HandleError]
     public class BaseController : Controller
     {
+        protected string sLogDir = System.Web.Configuration.WebConfigurationManager.AppSettings["logDir"];
+        protected string sLogSqlDir = System.Web.Configuration.WebConfigurationManager.AppSettings["logDir"] + "/sql";
+        protected string sLogReqAndResDir = System.Web.Configuration.WebConfigurationManager.AppSettings["logDir"] + "/reqResp";
+        protected string sLogReqAndRespFile = null;
+        protected string sLogSqlFile = null;
+        protected MemoryStream msLogSql = new MemoryStream();
+
         protected String Flg = "ny";
         public Char GetY()
-        {
+        { 
             //return Flg.Substring(0, 1);
             return Flg.ToArray()[1];
         }
@@ -32,12 +41,61 @@ namespace WMS.Controllers
 
         protected TransactionOptions options;
 
-        const string INTVER = "1.0.0.9";
-        const string APPVER = "164";
+        const string INTVER = "1.0.1.0";
+        const string APPVER = "166";
 
         protected bool CheckVer(string ver)
         {
             return ver.Trim() == APPVER.Trim();
+        }
+
+        protected void RedcStkotQtyNew(stkotdtl[] stkotdtl, double diffQty)
+        {
+            double diff = diffQty;
+
+            if (diffQty == 0)
+            {
+                return;
+            }
+
+            foreach (stkotdtl d in stkotdtl)
+            {
+                if (diffQty == 0)
+                {
+                    break;
+                }
+                if (d.preqty == null)
+                {
+                    d.preqty = d.qty;
+                }
+                if (diff > 0 && diff >= d.qty)
+                {
+                    diff -= d.qty;
+                    d.qty = 0;
+
+                    d.qty = Math.Round(d.qty, 4, MidpointRounding.AwayFromZero);
+                    d.pkgqty = Math.Round(d.qty, 4, MidpointRounding.AwayFromZero);
+                    d.taxamt = Math.Round(d.qty * d.prc * d.taxrto, 4);
+                    d.amt = Math.Round(d.qty * d.prc, 4);
+                    d.salamt = d.qty * d.salprc;
+                    d.patamt = Math.Round(d.qty * d.taxprc, 4);
+                    d.stotcstamt = Math.Round(d.qty * d.stotcstprc.Value, 4);
+                }
+                else if (diff > 0 && diff < d.qty)
+                {
+                    d.qty = d.qty - diff;
+                    diff = 0;
+
+                    d.qty = Math.Round(d.qty, 4, MidpointRounding.AwayFromZero);
+                    d.pkgqty = Math.Round(d.qty, 4, MidpointRounding.AwayFromZero);
+                    d.taxamt = Math.Round(d.qty * d.prc * d.taxrto, 4);
+                    d.amt = Math.Round(d.qty * d.prc, 4);
+                    d.salamt = d.qty * d.salprc;
+                    d.patamt = Math.Round(d.qty * d.taxprc, 4);
+                    d.stotcstamt = Math.Round(d.qty * d.stotcstprc.Value, 4);
+                }
+            }
+            WmsDc.SubmitChanges();
         }
 
         //扣减stkotdtl里面的库存
@@ -237,6 +295,43 @@ namespace WMS.Controllers
             return View();
         }
 
+        protected override void OnActionExecuted(ActionExecutedContext filterContext)
+        //protected virtual void OnResultExecuted(ResultExecutedContext filterContext)
+        {                        
+            //得到url
+            //得到post params
+            //得到返回值
+            if (!string.IsNullOrEmpty(sLogReqAndRespFile))
+            {
+                string sUrl = filterContext.HttpContext.Request.Url.PathAndQuery;
+                string sParamters = "";
+                foreach (string s in filterContext.HttpContext.Request.Form.Keys)
+                {
+                    sParamters += s + "=" + filterContext.HttpContext.Request.Form[s] + "&";
+                }
+                JavaScriptSerializer jss = new JavaScriptSerializer();
+                String sResult = jss.Serialize(((JsonResult)filterContext.Result).Data);
+                String sReqTime = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
+                String sReqResp = "===============================================\r\n";
+                string sColSplitChars = "||||";
+                sReqResp += sReqTime + sColSplitChars + sUrl + sColSplitChars + sParamters + sColSplitChars + sResult + "\r\n";
+                sReqResp += "===============================================\r\n";
+                System.IO.File.AppendAllText(sLogReqAndRespFile, sReqResp, Encoding.UTF8);
+            }
+            
+            
+            //得到执行的sql语句，写入随机数文件中
+            if (WmsDc.Log != null)
+            {
+                WmsDc.Log.Flush();
+                msLogSql.Position = 0;
+                StreamReader sr = new StreamReader(msLogSql);
+                String slogSql = sr.ReadToEnd();
+                System.IO.File.AppendAllText(sLogSqlFile, slogSql, Encoding.UTF8);
+                //WmsDc.Log.Close();                
+            }                        
+        }
+
         /// <summary>
         /// 初始化Controller
         /// </summary>
@@ -245,6 +340,14 @@ namespace WMS.Controllers
         {
             //1.初始化变量
             WmsDc = new WMSDcDataContext();
+            sLogReqAndRespFile = sLogReqAndResDir + "/" + DateTime.Now.ToString("yyyyMMdd") + ".log";
+
+            //如果随机数不为空，就写入sql日志
+            if (!string.IsNullOrEmpty(requestContext.HttpContext.Request["rnd"]))
+            {                
+                sLogSqlFile = sLogSqlDir + "/" + requestContext.HttpContext.Request["rnd"] + ".log";
+                WmsDc.Log = new StreamWriter(msLogSql, Encoding.UTF8);                                
+            }
             options = new TransactionOptions();
             options.IsolationLevel = IsolationLevel.ReadCommitted; //默认为Serializable,这里根据参数来进行调整
 
@@ -407,6 +510,16 @@ namespace WMS.Controllers
             Rm.ResultDesc = desc;
             return ReturnResult();
         }
+
+        protected ActionResult RInfo(string code, object obj)
+        {
+            String desc = "";
+            string desc1 = GetDescByCode(code);            
+            Rm.ResultObject = obj;
+            Rm.ExtCode = code;
+            return ReturnResult(ResultMessage.RESULTMESSAGE_INFO, desc);
+        }
+
         //返回警告信息
         /// <summary>
         /// 返回警告信息

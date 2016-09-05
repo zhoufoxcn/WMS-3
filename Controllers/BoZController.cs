@@ -61,6 +61,7 @@ namespace WMS.Controllers
             
             using (TransactionScope scop = new TransactionScope(TransactionScopeOption.Required, options))
             {
+                //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "1", LoginInfo.DefSavdptid);
                 gdsid = GetGdsidByGdsidOrBcd(gdsid);                
 
                 //正在生成拣货单，请稍候重试
@@ -248,8 +249,11 @@ namespace WMS.Controllers
 
                     }
 
+                    //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "2", LoginInfo.DefSavdptid);
+
                     WmsDc.SubmitChanges();
-                    scop.Complete();                    
+                    
+                    scop.Complete();
                     return RSucc("成功", null, "S0038");
                 }
                 catch (Exception ex)
@@ -329,6 +333,8 @@ namespace WMS.Controllers
 
         private void CkBzFlg(stkot p)
         {
+            i(p.wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "3", LoginInfo.DefSavdptid);
+
             //盘点是否有为空的明细
             var qrydtl = p.stkotdtl.Where(e => e.qty == 0 && e.bzflg == GetN());
             foreach (stkotdtl d in qrydtl)
@@ -367,6 +373,8 @@ namespace WMS.Controllers
                 WmsDc.stklst.InsertOnSubmit(astklst);
                 WmsDc.SubmitChanges();
             }
+
+            i(p.wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "4", LoginInfo.DefSavdptid);
         }
 
         /// <summary>
@@ -378,7 +386,6 @@ namespace WMS.Controllers
         public ActionResult GetBoZBllSummary(String wmsno)
         {
             String Dat = GetCurrentDay();            
-
 
             var qry = from e in WmsDc.stkot
                       join e1 in WmsDc.stkotdtl on e.stkouno equals e1.stkouno

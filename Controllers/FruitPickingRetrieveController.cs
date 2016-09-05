@@ -928,7 +928,8 @@ namespace WMS.Controllers
                                      && e.stkot.wmsno == cutgds.wmsno
                                      && e.gdsid == cutgds.gdsid
                                      && e.stkot.rcvdptid == rcvdptid.Trim()
-                                     orderby e.qty descending
+                                     //orderby e.qty descending
+                                     orderby Convert.ToInt32(e.stkot.rcvdptid) descending, e.qty descending
                                      select e).ToArray();
                     double q = qrystkdtl.Sum(e => e.qty) - cutgds.qty;
 

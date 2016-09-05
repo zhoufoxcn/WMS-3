@@ -126,6 +126,7 @@ namespace WMS.Controllers
         [PWR(Pwrid = WMSConst.WMS_BACK_拣货查询, pwrdes = "拣货查询")]
         public ActionResult GetRetriveBllDtl(String wmsno, String lnkbllid, string parity, string channel, string ceng, string sxjx, string barcode, string gdsid)
         {
+            //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "15", LoginInfo.DefSavdptid);
             if (lnkbllid == null)
             {
                 lnkbllid = "206";
@@ -394,12 +395,15 @@ namespace WMS.Controllers
                 return RNoData("N0171");  // 该拣货单未找到符合条件的明细信息
             }
 
+            //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "16", LoginInfo.DefSavdptid);
+
             if (!string.IsNullOrEmpty(barcode))
             {
                 JsonResult jr = (JsonResult)GetCurrdayAllRetrieveByBarcode(barcode, gdsid);
                 ResultMessage rm = (ResultMessage)jr.Data;
                 if (rm.ResultCode == ResultMessage.RESULTMESSAGE_SUCCESS)
                 {
+                    //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "17", LoginInfo.DefSavdptid);
                     return RSucc("成功", arrqrydtl, new
                     {
                         UnRetrieveTongdao = arrUnRetrieveTongdao,
@@ -410,6 +414,7 @@ namespace WMS.Controllers
                 }
                 else
                 {
+                    //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "18", LoginInfo.DefSavdptid);
                     return RSucc("成功", arrqrydtl, new
                     {
                         UnRetrieveTongdao = arrUnRetrieveTongdao,
@@ -418,6 +423,7 @@ namespace WMS.Controllers
                     }, "S0173");
                 }
             }
+            //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "19", LoginInfo.DefSavdptid);
 
             return RSucc("成功", arrqrydtl, new
             {
@@ -439,6 +445,7 @@ namespace WMS.Controllers
                            && e.gdsid == gdsid.Trim()
                            select e;
              */
+            //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "11", LoginInfo.DefSavdptid);
             var qrystkot = from e in WmsDc.stkot
                            join e1 in WmsDc.stkotdtl on e.stkouno equals e1.stkouno
                            join e2 in WmsDc.gds on e1.gdsid equals e2.gdsid
@@ -499,16 +506,20 @@ namespace WMS.Controllers
                     gdsid.Trim() + ":应拣:" + Math.Round(stkotdtl.Sum(e => e.qty), 4, MidpointRounding.AwayFromZero)
                     + ";实拣:" + Math.Round(qty, 4, MidpointRounding.AwayFromZero),
                     "", LoginInfo.DefSavdptid);
+                
                 double diff = stkotdtl.Sum(e => e.qty) - qty;
 
                 //扣减stkotdtl里面的库存
-                RedcStkotQty(stkotdtl.ToArray(), diff);
+                RedcStkotQtyNew(stkotdtl.ToArray(), diff);
+
+                //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "12", LoginInfo.DefSavdptid);
             }
-            return RSucc("成功", null, "{{}}");   //todo 编码
+            return RSucc("成功", null, "{{S: {0} }}");   //todo 编码
         }
 
         private ActionResult BokRetrieveP(String wmsno, String bllid, String bocino, String clsid, String checi, String gdsid, double qty)
         {
+            //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "13", LoginInfo.DefSavdptid);
             //得到wms_cutgds
             var qry = from e in WmsDc.wms_cutgds
                       join e1 in WmsDc.gds on e.gdsid equals e1.gdsid
@@ -549,6 +560,7 @@ namespace WMS.Controllers
             try
             {
                 WmsDc.SubmitChanges();
+                //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "14", LoginInfo.DefSavdptid);
             }
             catch (Exception ex)
             {
@@ -690,8 +702,7 @@ namespace WMS.Controllers
             //{
             //    return RInfo( "I0369" );
             //}
-
-            
+            //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "1", LoginInfo.DefSavdptid);
                 //检索主表、明细表
                 var qrymst = from e in WmsDc.wms_cang
                              where e.bllid == WMSConst.BLL_TYPE_RETRIEVE
@@ -806,6 +817,8 @@ namespace WMS.Controllers
                 {
                     i(wmsno, WMSConst.BLL_TYPE_RETRIEVE, "拣货商品明细确认", "应拣数量：" + dtl.preqty + "，实拣数量:" + dtl.qty, mst.qu, mst.savdptid);
                 }
+
+                //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "2", LoginInfo.DefSavdptid);
                 #endregion
 
                 #region 如果是206配送拣货的单据，在同一个拣货单里面同一商品确认完后，写入分货表(边拣边播)
@@ -869,14 +882,14 @@ namespace WMS.Controllers
                                     && e.stkot.wmsno == cutgds.wmsno
                                     && e.gdsid == cutgds.gdsid
                                     && e.bzflg == 'n'
-                                    orderby Convert.ToInt32(e.stkot.rcvdptid), e.qty descending
+                                    orderby Convert.ToInt32(e.stkot.rcvdptid) descending, e.qty descending
                                     select e;
                     //double q = qrystkdtl.Sum(e => e.qty) - cutgds.qty;
                     double q = cutgds.preqty.Value - cutgds.qty;
                     var stkotdtl = qrystkdtl.ToArray();
 
                     //扣减stkotdtl里面的库存
-                    RedcStkotQty(stkotdtl, q);
+                    RedcStkotQtyNew(stkotdtl, q);
 
                     try
                     {
@@ -895,6 +908,7 @@ namespace WMS.Controllers
                     }
                     #endregion
 
+                    //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "3", LoginInfo.DefSavdptid);
                     if (iCnt == 0)
                     {
                         //如果是分货播种就写入分货表
@@ -1054,11 +1068,12 @@ namespace WMS.Controllers
                             #endregion 写入分货表
                         }
 
-
+                        //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "4", LoginInfo.DefSavdptid);
                     }
                 }
                 #endregion
 
+                //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "5", LoginInfo.DefSavdptid);
                 #region 如果是206配送拣货单已经拣货的数量满足一个堆堆，就按堆堆应分数量升序写入分货表（按堆堆播种）
                 if (IsCutgds(mst.qu) && mst.lnkbllid.Trim() == "206")
                 {
@@ -1382,7 +1397,7 @@ namespace WMS.Controllers
                                                         select e1
                                                       ).Any()
                                                       select e;
-                                    RedcStkotQty(qryStkotdtl.ToArray(), nec.preqty - nec.qty);
+                                    RedcStkotQtyNew(qryStkotdtl.ToArray(), nec.preqty - nec.qty);
                                     nec.preqty = nec.qty;
                                 }
                                 try
@@ -1408,6 +1423,8 @@ namespace WMS.Controllers
                     
                 }
                 #endregion 如果是206配送拣货单已经拣货的数量满足一个堆堆，就按堆堆应分数量升序写入分货表
+
+                //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "6", LoginInfo.DefSavdptid);
 
                 #region 判断是否是该拣货单下的配送单有没有已经播种完了的单据（包括为0的商品），有就修改改配送单下的明细为0的播种标记，和主单播种标记
                 //将配送单下修改为0的配送明细，直接修改其播种标记
@@ -1498,11 +1515,15 @@ namespace WMS.Controllers
                 }
                 #endregion 判断是否是该拣货单下的配送单有没有已经播种完了的单据（包括为0的商品），有就修改改配送单下的明细为0的播种标记，和主单播种标记
 
+                //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "7", LoginInfo.DefSavdptid);
+
                 try
                 {
                     try
                     {
                         WmsDc.SubmitChanges();
+
+                        //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "8", LoginInfo.DefSavdptid);
                     }
                     catch (Exception ex)
                     {
@@ -1602,7 +1623,7 @@ namespace WMS.Controllers
                 double diff = stkotdtl.Sum(e => e.qty) - qty;
 
                 //扣减stkotdtl里面的库存
-                RedcStkotQty(stkotdtl, diff);
+                RedcStkotQtyNew(stkotdtl, diff);
 
             }
             return RSucc("成功", null, "S0233");   //todo 编码

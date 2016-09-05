@@ -87,14 +87,21 @@ namespace WMS.Controllers
             }
             var qryPkgbcd = (from e in WmsDc.wms_pkgbcd
                             join e1 in WmsDc.emp on e.uptpsn equals e1.empid
+                            join e2 in WmsDc.gds on e.gdsid equals e2.gdsid
                             where e.pkgbcd == pkgbcd.Trim()
                             select new{
-                                e.gdsid, e.pkgbcd, uptpsndes = e1.empdes.Trim(),
-                                e.uptpsn
+                                e.gdsid, e.pkgbcd, uptpsndes = e1.empdes.Trim(), e.udtdtm,
+                                e.uptpsn, e2.gdsdes, e2.spc, e2.bsepkg
                             }).FirstOrDefault();
             if (qryPkgbcd!=null)
+            {                
+                //return RInfo("I0499", pkgbcd.Trim(), qryPkgbcd.gdsid, qryPkgbcd.gdsdes, qryPkgbcd.spc, qryPkgbcd.bsepkg, qryPkgbcd.udtdtm, qryPkgbcd.uptpsndes);
+                return RInfo("I0499", qryPkgbcd);
+            }
+            string gdsid1 = GetGdsidByGdsidOrBcd(pkgbcd);
+            if (!string.IsNullOrEmpty(gdsid1))
             {
-                return RInfo("I0499", qryPkgbcd.uptpsndes);
+                return RInfo("I0505");
             }
             string bcd = GetABcdByGdsid1(gdsid);
             if (bcd == pkgbcd)

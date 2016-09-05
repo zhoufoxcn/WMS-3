@@ -2673,6 +2673,41 @@
             <param name="busid">车次号</param>
             <returns></returns>
         </member>
+        <member name="M:WMS.Controllers.PkgBcdController.#ctor">
+            <summary>
+            箱装码管理
+            </summary>
+        </member>
+        <member name="M:WMS.Controllers.PkgBcdController.GetPkgBcdByGdsid(System.String)">
+            <summary>
+            根据 gdsid/bcd 查找箱装码信息 
+            </summary>
+            <param name="gdsid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WMS.Controllers.PkgBcdController.GetGdsByPkgBcd(System.String)">
+            <summary>
+            根据箱装码查找 商品信息
+            </summary>
+            <param name="pkgbcd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WMS.Controllers.PkgBcdController.AddPkgBcd(System.String,System.String)">
+            <summary>
+            增加箱装码
+            </summary>
+            <param name="pkgbcd"></param>
+            <param name="gdsid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WMS.Controllers.PkgBcdController.DlPkgBcd(System.String,System.String)">
+            <summary>
+            删除箱装码
+            </summary>
+            <param name="pkgbcd"></param>
+            <param name="gdsid"></param>
+            <returns></returns>
+        </member>
         <member name="T:WMS.Controllers.OverQuAdjustBarcodeController">
             <summary>
             跨区仓位调整
@@ -3521,41 +3556,6 @@
             <param name="barcode">仓位编码</param>
             <param name="bkr">分货确认人</param>
             <param name="gdsid">商品编码</param>
-            <returns></returns>
-        </member>
-        <member name="M:WMS.Controllers.PkgBcdController.#ctor">
-            <summary>
-            箱装码管理
-            </summary>
-        </member>
-        <member name="M:WMS.Controllers.PkgBcdController.GetPkgBcdByGdsid(System.String)">
-            <summary>
-            根据 gdsid/bcd 查找箱装码信息 
-            </summary>
-            <param name="gdsid"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WMS.Controllers.PkgBcdController.GetGdsByPkgBcd(System.String)">
-            <summary>
-            根据箱装码查找 商品信息
-            </summary>
-            <param name="pkgbcd"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WMS.Controllers.PkgBcdController.AddPkgBcd(System.String,System.String)">
-            <summary>
-            增加箱装码
-            </summary>
-            <param name="pkgbcd"></param>
-            <param name="gdsid"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WMS.Controllers.PkgBcdController.DlPkgBcd(System.String,System.String)">
-            <summary>
-            删除箱装码
-            </summary>
-            <param name="pkgbcd"></param>
-            <param name="gdsid"></param>
             <returns></returns>
         </member>
     </members>

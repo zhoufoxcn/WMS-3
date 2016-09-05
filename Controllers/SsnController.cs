@@ -410,7 +410,7 @@ namespace WMS.Controllers
                          && qus.Contains(e.qu)
                          && e.chkflg == GetN()
                          && e1.bokflg == GetN()
-                         && e.mkedat.Substring(0, 8) == currday
+                         //&& e.mkedat.Substring(0, 8) == currday
                          group e1 by new { e4.dptid, e4.dptdes, e1.barcode, e1.gdsid, e2.gdsdes, e2.spc, e2.bsepkg, e3.pkgdes, e3.cnvrto }
                              into g
                              select new
@@ -428,6 +428,11 @@ namespace WMS.Controllers
                                  qty = g.Sum(ee => ee.qty),
                                  preqty = g.Sum(ee => ee.preqty)
                              };
+            //如果有单号就不管是不是当天的
+            /*if (!string.IsNullOrEmpty(wmsno))
+            {
+                
+            }*/
             var qry115 = from e in WmsDc.wms_cang_115
                          join e1 in WmsDc.wms_cangdtl_115 on new { e.wmsno, e.bllid } equals new { e1.wmsno, e1.bllid }
                          join e2 in WmsDc.gds on e1.gdsid equals e2.gdsid
@@ -1449,20 +1454,24 @@ namespace WMS.Controllers
                       join e3 in
                           (from m in
                                WmsDc.wms_pkg
-                           group m by new { m.gdsid, m.cnvrto,  m.pkgdes } into g
+                           group m by new { m.gdsid, m.cnvrto, m.pkgdes } into g
                            select g.Key) on new { e1.gdsid } equals new { e3.gdsid }
                       into joinPkg
                       from e4 in joinPkg.DefaultIfEmpty()
                       join e5 in WmsDc.gds on e1.gdsid equals e5.gdsid
-                      join e6 in WmsDc.wms_boci on new { dh = e2.lnkbocino, sndtmd = e2.lnkbocidat, e2.qu } equals new { e6.dh, e6.sndtmd, e6.qu }
-                      join e7 in WmsDc.view_pssndgds on new { e6.dh, e6.clsid, e6.sndtmd, e.rcvdptid, e6.qu } equals new { e7.dh, e7.clsid, e7.sndtmd, e7.rcvdptid, e7.qu }
+                      join ee6 in WmsDc.wms_boci on new { dh = e2.lnkbocino, sndtmd = e2.lnkbocidat, e2.qu } equals new { ee6.dh, ee6.sndtmd, ee6.qu }
+                      into joinBoci
+                      from e6 in joinBoci.DefaultIfEmpty()
+                      join ee7 in WmsDc.view_pssndgds on new { e6.dh, e6.clsid, e6.sndtmd, e.rcvdptid, e6.qu } equals new { ee7.dh, ee7.clsid, ee7.sndtmd, ee7.rcvdptid, ee7.qu }
+                      into joinPssndgds
+                      from e7 in joinPssndgds.DefaultIfEmpty()
                       join e8 in WmsDc.emp on e1.bzr equals e8.empid
                       into joinEmp
                       from e9 in joinEmp.DefaultIfEmpty()
-                      join e10 in WmsDc.dpt on e.rcvdptid equals e10.dptid                      
+                      join e10 in WmsDc.dpt on e.rcvdptid equals e10.dptid
                       where e.bllid == WMSConst.BLL_TYPE_DISPATCH
                       && savdpts.Contains(e.savdptid)
-                      && e6.sndtmd == dat
+                      && (e6 != null ? e6.sndtmd == dat : e2.mkedat == dat)
                       group new
                       {
                           e.rcvdptid,
@@ -1520,7 +1529,7 @@ namespace WMS.Controllers
                           bzrdes = g.Key.empdes,
                           bzdat = g.Key.bzdat.Trim(),
                           preqty = g.Sum(e => e.preqty == null ? 0 : e.preqty),
-                          pkg03 = GetPkgStr(g.Sum(e=>e.qty), g.Key.cnvrto, g.Key.pkgdes),
+                          pkg03 = GetPkgStr(g.Sum(e => e.qty), g.Key.cnvrto, g.Key.pkgdes),
                           pkg03pre = GetPkgStr(g.Sum(e => e.preqty == null ? 0 : e.preqty), g.Key.cnvrto, g.Key.pkgdes)
                       };
             return qry;
@@ -1694,8 +1703,14 @@ namespace WMS.Controllers
                 return null;
             }
             var qry = (bllid.Trim() == WMSConst.BLL_TYPE_INNERADJ) ? Ndbz(dat) :
-                    (bllid.Trim() == WMSConst.BLL_TYPE_DISPATCH) ? Psbz(dat) :
-                    (bllid.Trim() == WMSConst.BLL_TYPE_WXDISPATCH) ? Wxbz(dat) : null;
+                        (bllid.Trim() == WMSConst.BLL_TYPE_DISPATCH) ? Psbz(dat) :
+                        (bllid.Trim() == WMSConst.BLL_TYPE_WXDISPATCH) ? Wxbz(dat) : null;
+            if ((string.IsNullOrEmpty(bllid) || bllid.ToLower() == "all") && !string.IsNullOrEmpty(gdsid))
+            {
+                qry = Ndbz(dat).Where(e => e.gdsid == gdsid.Trim())
+                    .Union(Psbz(dat).Where(e => e.gdsid == gdsid.Trim()))
+                    .Union(Wxbz(dat).Where(e => e.gdsid == gdsid.Trim()));
+            }
 
             if (!string.IsNullOrEmpty(boci))
             {
@@ -2098,8 +2113,7 @@ namespace WMS.Controllers
                 //Log.i(LoginInfo.Usrid, Mdlid, wmsno, bllid, actid, brief, qu, savdptid);
             }
         }
-
-        protected string sLogDir = System.Web.Configuration.WebConfigurationManager.AppSettings["logDir"];
+        
         protected void iFile(string desc)
         {
             if (WMSConst.DEBUG)
@@ -2851,6 +2865,42 @@ namespace WMS.Controllers
         /// <returns></returns>
         protected String GetGdsidByGdsidOrBcd(String gdsid)
         {
+            string sgdsid = null;
+            WmsDc.get_wms_gds(gdsid, ref sgdsid);            
+            return sgdsid!=null?sgdsid.Trim():null;
+            /*var qrypkgbcd = (from e in WmsDc.wms_pkgbcd
+                            where e.pkgbcd == gdsid
+                            select e).FirstOrDefault();
+            if (qrypkgbcd != null)
+            {
+                return qrypkgbcd.gdsid.Trim();
+            }
+            else
+            {
+                var qrybcd = (from e in WmsDc.bcd
+                             where e.bcd1 == gdsid
+                             select e).FirstOrDefault();
+                if (qrybcd != null)
+                {
+                    return qrybcd.gdsid.Trim();
+                }
+                else
+                {
+                    var qrygds = (from e in WmsDc.gds
+                                 where e.gdsid == gdsid
+                                 select e).FirstOrDefault();
+                    if (qrygds != null)
+                    {
+                        return qrygds.gdsid.Trim();
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }*/
+            
+            /*
             var qry = from e in WmsDc.gds
                       join e1 in WmsDc.bcd on e.gdsid equals e1.gdsid
                       into joinBcdDefault                      
@@ -2867,6 +2917,7 @@ namespace WMS.Controllers
                 return null;
             }
             return arrqry[0].gdsid.Trim();
+             */
         }
 
         /// <summary>

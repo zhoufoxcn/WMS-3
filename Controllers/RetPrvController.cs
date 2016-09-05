@@ -463,11 +463,12 @@ namespace WMS.Controllers
                 {
                     return RInfo("I0343", mst.mkr, LoginInfo.Usrid);
                 }
+                
                 //删除单据明细
                 WmsDc.wms_cangdtl_110.DeleteAllOnSubmit(arrqrydtl);
                 WmsDc.wms_cang_110.DeleteAllOnSubmit(arrqrymst);
-                iDelCangDtl110(arrqrydtl, mst);
-                iDelCangMst110(arrqrymst[0]);
+                //iDelCangDtl110(arrqrydtl, mst);
+                //iDelCangMst110(arrqrymst[0]);
                 //删除主单据
                 try
                 {
@@ -476,17 +477,6 @@ namespace WMS.Controllers
                     if (mst!=null && mst.chkflg == GetY())
                     {
                         return RInfo("I0207");
-                    }
-
-                    if (iDtlCount > 1)
-                    {
-                        //修改主单时间戳
-                        string sql = @"update wms_cang_110 set bllid='110' where wmsno='" + mst.wmsno + "' and bllid='110' and udtdtm={0}";
-                        int iEff = WmsDc.ExecuteCommand(sql, mst.udtdtm);
-                        if (iEff == 0)
-                        {
-                            return RInfo("I0207");
-                        }
                     }
 
                     WmsDc.SubmitChanges();

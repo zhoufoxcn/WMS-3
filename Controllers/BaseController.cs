@@ -11,6 +11,7 @@ using System.Transactions;
 using System.Web.Script.Serialization;
 using System.IO;
 using System.Text;
+using System.Data.Linq;
 
 namespace WMS.Controllers
 {
@@ -41,13 +42,21 @@ namespace WMS.Controllers
 
         protected TransactionOptions options;
 
-        const string INTVER = "1.0.1.0";
-        const string APPVER = "166";
+        const string INTVER = "1.0.1.1";
+        const string APPVER = "168";
 
         protected bool CheckVer(string ver)
         {
-            return ver.Trim() == APPVER.Trim();
+            PhoneAppsDataClassesDataContext pc = new PhoneAppsDataClassesDataContext();
+            string vercode = (from e in pc.ApkInfo
+                              where e.appname == "HqlsWMS.apk"
+                              orderby e.versioncode descending
+                              select e.versioncode).FirstOrDefault();
+
+            return ver.Trim() == vercode.Trim();
         }
+
+        
 
         protected void RedcStkotQtyNew(stkotdtl[] stkotdtl, double diffQty)
         {
@@ -95,7 +104,7 @@ namespace WMS.Controllers
                     d.stotcstamt = Math.Round(d.qty * d.stotcstprc.Value, 4);
                 }
             }
-            WmsDc.SubmitChanges();
+            WmsDc.SubmitChanges(ConflictMode.FailOnFirstConflict);
         }
 
         //扣减stkotdtl里面的库存
@@ -309,14 +318,17 @@ namespace WMS.Controllers
                 {
                     sParamters += s + "=" + filterContext.HttpContext.Request.Form[s] + "&";
                 }
-                JavaScriptSerializer jss = new JavaScriptSerializer();
-                String sResult = jss.Serialize(((JsonResult)filterContext.Result).Data);
-                String sReqTime = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
-                String sReqResp = "===============================================\r\n";
-                string sColSplitChars = "||||";
-                sReqResp += sReqTime + sColSplitChars + sUrl + sColSplitChars + sParamters + sColSplitChars + sResult + "\r\n";
-                sReqResp += "===============================================\r\n";
-                System.IO.File.AppendAllText(sLogReqAndRespFile, sReqResp, Encoding.UTF8);
+                if (!string.IsNullOrEmpty(sParamters))
+                {
+                    JavaScriptSerializer jss = new JavaScriptSerializer();
+                    String sResult = jss.Serialize(((JsonResult)filterContext.Result).Data);
+                    String sReqTime = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
+                    String sReqResp = "===============================================\r\n";
+                    string sColSplitChars = "||||";
+                    sReqResp += sReqTime + sColSplitChars + sUrl + sColSplitChars + sParamters + sColSplitChars + sResult + "\r\n";
+                    sReqResp += "===============================================\r\n";
+                    System.IO.File.AppendAllText(sLogReqAndRespFile, sReqResp, Encoding.UTF8);
+                }
             }
             
             
@@ -471,7 +483,8 @@ namespace WMS.Controllers
             {
                 Rm.ResultCode = "-5";
                 Rm.ResultDesc = "APP版本与接口版本不一致，请求失败";
-                Rm.ExtObject = "-5";
+                Rm.ExtCode = "-5";
+                Rm.ExtObject = null;
                 Rm.ResultObject = null;
 
                 requestContext.HttpContext.Response.ContentType = "application/json";
@@ -514,8 +527,9 @@ namespace WMS.Controllers
         protected ActionResult RInfo(string code, object obj)
         {
             String desc = "";
-            string desc1 = GetDescByCode(code);            
-            Rm.ResultObject = obj;
+            string desc1 = GetDescByCode(code);
+            desc = string.Format(desc1, obj);
+            Rm.ResultObject = null;
             Rm.ExtCode = code;
             return ReturnResult(ResultMessage.RESULTMESSAGE_INFO, desc);
         }

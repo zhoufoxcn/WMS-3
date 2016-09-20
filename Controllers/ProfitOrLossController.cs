@@ -834,7 +834,7 @@ namespace WMS.Controllers
                     return RInfo("I0208");
                 }
                 //判断商品是否已经再单据里面                
-                int iHasIn = arrqrydtl.Where(e => e.gdsid == gdsid && e.gdstype == gdstype && e.barcode == barcode && e.bthno == dtl.bthno.Trim() && e.vlddat == dtl.vlddat.Trim()).Count();
+                int iHasIn = qrydtl.Where(e => e.gdsid == gdsid && e.gdstype == gdstype && e.barcode == barcode && e.bthno == dtl.bthno.Trim() && e.vlddat == dtl.vlddat.Trim()).Count();
                 if (iHasIn > 0)
                 {
                     return RInfo("I0209", gdsid);

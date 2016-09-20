@@ -647,6 +647,7 @@ namespace WMS.Controllers
                             sdtl.sft_sdtout = dp.oldsavdptid;
                             sdtl.stkinno = sin.stkinno;
                             WmsDc.sftdtl.InsertOnSubmit(sdtl);
+                            
                             #endregion 插入sftdtl表
                         }
                         //插入明细单据
@@ -951,7 +952,8 @@ namespace WMS.Controllers
         public ActionResult AdAdjBarcode(String wmsno, String gdsid, int rcdidx, String newbarcode, double qty)
         {
             using (TransactionScope scop = new TransactionScope(TransactionScopeOption.Required, options))
-            {
+            {                
+                //options.IsolationLevel = IsolationLevel.Serializable;
                 gdsid = GetGdsidByGdsidOrBcd(gdsid);
 
                 //正在生成拣货单，请稍候重试
@@ -2499,6 +2501,8 @@ delete wms_blldtl from wms_blldtl a inner join wms_bllmst b on a.wmsno=b.wmsno a
                       select new
                       {
                           e.wmsno,
+                          e1.vlddat,
+                          e1.bthno,
                           e2.gdsid,
                           e2.gdsdes,
                           e2.spc,
@@ -2553,7 +2557,7 @@ delete wms_blldtl from wms_blldtl a inner join wms_bllmst b on a.wmsno=b.wmsno a
             var qrykeyarr = arrqrymst.GroupBy(e=>new
             {
                 e.wmsno, e.spc,e.preqty, e.prepkg03, e.pkgdes, e.oldbarcode, 
-                e.mkrdes,e.mkr,e.mkedat,e.gdsid,e.gdsdes,e.cnvrto,e.ckrdes,e.ckr,e.chkflg,e.chkdat,e.bsepkg                
+                e.mkrdes,e.mkr,e.mkedat,e.gdsid,e.gdsdes,e.cnvrto,e.ckrdes,e.ckr,e.chkflg,e.chkdat,e.bsepkg, e.bthno, e.vlddat              
             });
             var qryarr = (from e in qrykeyarr
                          select new
@@ -2564,13 +2568,15 @@ delete wms_blldtl from wms_blldtl a inner join wms_bllmst b on a.wmsno=b.wmsno a
                                    e1.prepkg03 == e.Key.prepkg03 && e1.pkgdes == e.Key.pkgdes &&
                                    e1.oldbarcode == e.Key.oldbarcode && e1.mkrdes == e.Key.mkrdes &&
                                    e1.mkr == e.Key.mkr && e1.mkedat == e.Key.mkedat && e1.gdsid == e.Key.gdsid &&
-                                   e1.ckr == e.Key.ckr && e1.chkdat == e.Key.chkdat
+                                   e1.ckr == e.Key.ckr && e1.chkdat == e.Key.chkdat && e1.vlddat==e.Key.vlddat &&　e1.bthno ==e.Key.bthno
                                    select new
                                    {
                                        e1.newbarcode,
                                        e1.qty,
                                        e1.pkg03,
-                                       e1.rcdidx
+                                       e1.rcdidx,
+                                       e1.bthno,
+                                       e1.vlddat
                                    }
                          }).ToArray();
 

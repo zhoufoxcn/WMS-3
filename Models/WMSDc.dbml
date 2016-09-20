@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="test_newshop" Class="WMSDcDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=192.10.200.1;Initial Catalog=test_newshop;Persist Security Info=True;User ID=app" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="newshopConnectionString" Provider="System.Data.SqlClient" />
+  <Connection Mode="WebSettings" ConnectionString="Data Source=192.10.200.3;Initial Catalog=newshop;Persist Security Info=True;User ID=app" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="newshopConnectionString" Provider="System.Data.SqlClient" />
   <Table Name="dbo.wms_bzmst" Member="wms_bzmst">
     <Type Name="wms_bzmst">
       <Column Name="wmsno" Type="System.String" DbType="VarChar(14) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />

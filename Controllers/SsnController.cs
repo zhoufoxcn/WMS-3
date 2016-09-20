@@ -9,6 +9,7 @@ using System.Web.Script.Serialization;
 using System.IO;
 using WMS.Common;
 using WMS.Models;
+using System.Data.Linq;
 
 namespace WMS.Controllers
 {
@@ -90,6 +91,8 @@ namespace WMS.Controllers
                 return spqu.Where(e => qus.Contains(e)).ToArray();
             }
         }
+
+
         /// <summary>
         /// 退货损区
         /// </summary>
@@ -388,6 +391,30 @@ namespace WMS.Controllers
                 return q.branchid;
             }
             return null;
+        }
+
+        protected void CancelDeleteAndInsert(WMSDcDataContext dc)
+        {
+            ChangeSet ch = dc.GetChangeSet();
+
+            foreach (Object ins in ch.Inserts)
+            {
+                dc.GetTable(ins.GetType()).DeleteOnSubmit(ins);
+            }
+
+            foreach (Object del in ch.Deletes)
+            {
+                dc.GetTable(del.GetType()).InsertOnSubmit(del);
+            }
+        }
+
+        protected void CancelUpdate(WMSDcDataContext dc)
+        {            
+            ChangeSet ch = dc.GetChangeSet();
+            foreach (Object up in ch.Updates)
+            {
+                dc.Refresh(RefreshMode.OverwriteCurrentValues, up);
+            }
         }
 
         /// <summary>

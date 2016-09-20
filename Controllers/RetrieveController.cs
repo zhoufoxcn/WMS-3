@@ -582,7 +582,7 @@ namespace WMS.Controllers
         public ActionResult BokRetrieveGdss(String wmsno, String barcode, String gdsid, double qty)
         {
             using (TransactionScope scop = new TransactionScope(TransactionScopeOption.Required, options))
-            {
+            {                
                 //检索主表、明细表
                 var qrymst = from e in WmsDc.wms_cang
                              where e.bllid == WMSConst.BLL_TYPE_RETRIEVE
@@ -672,13 +672,17 @@ namespace WMS.Controllers
                 }
                 try
                 {
-                    WmsDc.SubmitChanges();
+                    WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                     scop.Complete();
                     return RSucc("成功", null, "S0222");
                     
                 }
                 catch (Exception ex)
                 {
+                    CancelDeleteAndInsert(WmsDc);
+                    CancelUpdate(WmsDc);
+                    WmsDc.SubmitChanges();
+                    scop.Complete();
                     return RErr(ex.Message, "E0070");
                 }
             }
@@ -800,10 +804,14 @@ namespace WMS.Controllers
 
                 try
                 {
-                    WmsDc.SubmitChanges();
+                    WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                 }
                 catch (Exception ex)
                 {
+                    CancelDeleteAndInsert(WmsDc);
+                    CancelUpdate(WmsDc);
+                    WmsDc.SubmitChanges();
+
                     if (ex.Message.IndexOf("牺牲品") > 0)
                     {
                         return RInfo("E0075");
@@ -877,26 +885,51 @@ namespace WMS.Controllers
                                             };
 
                     var cutgds = qryAllByGdsidCang.FirstOrDefault();
-                    var qrystkdtl = from e in WmsDc.stkotdtl
+                    /*var qrystkdtl = from e in WmsDc.stkotdtl
                                     where e.stkot.wmsbllid == cutgds.bllid
                                     && e.stkot.wmsno == cutgds.wmsno
                                     && e.gdsid == cutgds.gdsid
                                     && e.bzflg == 'n'
-                                    orderby Convert.ToInt32(e.stkot.rcvdptid) descending, e.qty descending
-                                    select e;
+                                    orderby  Convert.ToInt32(e.stkot.rcvdptid) descending, e.qty descending
+                                    select e;*/
+                    var qrystkdtl = from e in WmsDc.stkot
+                                    join e1 in WmsDc.stkotdtl on e.stkouno equals e1.stkouno
+                                    join e2 in WmsDc.gds on e1.gdsid equals e2.gdsid
+                                    join e33 in WmsDc.wms_cang on new { e.wmsno, e.wmsbllid } equals new { e33.wmsno, wmsbllid = e33.bllid }
+                                    into joinWms_cang from e3 in joinWms_cang.DefaultIfEmpty()
+                                    join ee4 in WmsDc.wms_boci on new { dh = e3.lnkbocino, sndtmd = e3.lnkbocidat, e3.qu } equals new { ee4.dh, ee4.sndtmd, ee4.qu }
+                                    into joinWms_boci from e4 in joinWms_boci.DefaultIfEmpty()
+                                    join ee5 in WmsDc.view_pssndgds on new { e4.dh, e4.clsid, e4.sndtmd, e.rcvdptid, e4.qu } equals new { ee5.dh, ee5.clsid, ee5.sndtmd, ee5.rcvdptid, ee5.qu }
+                                    into joinView_pssndgds from e5 in joinView_pssndgds.DefaultIfEmpty()
+                                    join ee6 in WmsDc.dpt on e.rcvdptid equals ee6.dptid
+                                    into joinDpt from e6 in joinDpt.DefaultIfEmpty()
+                                    join ee7 in WmsDc.wms_pkg on e2.gdsid equals ee7.gdsid
+                                    into joinWms_pkg from e7 in joinWms_pkg.DefaultIfEmpty()
+                                    where e.wmsno == cutgds.wmsno
+                      && e1.gdsid == cutgds.gdsid
+                      && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
+                      && e.bllid == WMSConst.BLL_TYPE_DISPATCH
+                      && e1.bzflg == 'n' && e1.qty > 0   //大于0的商品                      
+                                    orderby (e5!=null && e5.busid!=null) ? e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) : e5.busid descending,
+                                    (e5 != null && e5.busid != null) ? e5.busid.Trim().Substring(0, 3) : e5.busid descending,
+                                    Convert.ToInt32(e.rcvdptid) descending, e1.qty descending
+                                    select e1;
                     //double q = qrystkdtl.Sum(e => e.qty) - cutgds.qty;
                     double q = cutgds.preqty.Value - cutgds.qty;
-                    var stkotdtl = qrystkdtl.ToArray();
-
-                    //扣减stkotdtl里面的库存
-                    RedcStkotQtyNew(stkotdtl, q);
+                    var stkotdtl = qrystkdtl.ToArray();                    
 
                     try
                     {
-                        WmsDc.SubmitChanges();
+                        //扣减stkotdtl里面的库存
+                        RedcStkotQtyNew(stkotdtl, q);
+
+                        WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                     }
                     catch (Exception ex)
                     {
+                        CancelDeleteAndInsert(WmsDc);
+                        CancelUpdate(WmsDc);
+                        WmsDc.SubmitChanges();
                         if (ex.Message.IndexOf("牺牲品") > 0)
                         {
                             return RInfo("E0075");
@@ -1049,10 +1082,13 @@ namespace WMS.Controllers
                                 //WmsDc.wms_cutgds.InsertAllOnSubmit(lstCg);
                                 try
                                 {
-                                    WmsDc.SubmitChanges();
+                                    WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                                 }
                                 catch (Exception ex)
                                 {
+                                    CancelDeleteAndInsert(WmsDc);
+                                    CancelUpdate(WmsDc);
+                                    WmsDc.SubmitChanges();
                                     if (ex.Message.IndexOf("牺牲品") > 0)
                                     {
                                         return RInfo("E0075");
@@ -1196,10 +1232,13 @@ namespace WMS.Controllers
 
                                             try
                                             {
-                                                WmsDc.SubmitChanges();
+                                                WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                                             }
                                             catch (Exception ex)
                                             {
+                                                CancelDeleteAndInsert(WmsDc);
+                                                CancelUpdate(WmsDc);
+                                                WmsDc.SubmitChanges();
                                                 if (ex.Message.IndexOf("牺牲品") > 0)
                                                 {
                                                     return RInfo("E0075");
@@ -1289,10 +1328,13 @@ namespace WMS.Controllers
                                 WmsDc.wms_cutgds.InsertOnSubmit(cutgds);
                                 try
                                 {
-                                    WmsDc.SubmitChanges();
+                                    WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                                 }
                                 catch (Exception ex)
                                 {
+                                    CancelDeleteAndInsert(WmsDc);
+                                    CancelUpdate(WmsDc);
+                                    WmsDc.SubmitChanges();
                                     if (ex.Message.IndexOf("牺牲品") > 0)
                                     {
                                         return RInfo("E0075");
@@ -1354,7 +1396,7 @@ namespace WMS.Controllers
                             }
                             try
                             {
-                                WmsDc.SubmitChanges();
+                                WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                             }
                             catch (Exception ex)
                             {
@@ -1402,7 +1444,7 @@ namespace WMS.Controllers
                                 }
                                 try
                                 {
-                                    WmsDc.SubmitChanges();
+                                    WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                                 }
                                 catch (Exception ex)
                                 {
@@ -1441,10 +1483,14 @@ namespace WMS.Controllers
                 }
                 try
                 {
-                    WmsDc.SubmitChanges();
+                    WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                 }
                 catch (Exception ex)
                 {
+                    CancelDeleteAndInsert(WmsDc);
+                    CancelUpdate(WmsDc);
+                    WmsDc.SubmitChanges();
+
                     if (ex.Message.IndexOf("牺牲品") > 0)
                     {
                         return RInfo("E0075");
@@ -1500,10 +1546,14 @@ namespace WMS.Controllers
 
                 try
                 {
-                    WmsDc.SubmitChanges();
+                    WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
                 }
                 catch (Exception ex)
                 {
+                    CancelDeleteAndInsert(WmsDc);
+                    CancelUpdate(WmsDc);
+                    WmsDc.SubmitChanges();
+
                     if (ex.Message.IndexOf("牺牲品") > 0)
                     {
                         return RInfo("E0075");
@@ -1521,12 +1571,16 @@ namespace WMS.Controllers
                 {
                     try
                     {
-                        WmsDc.SubmitChanges();
+                        WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
 
                         //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "8", LoginInfo.DefSavdptid);
                     }
                     catch (Exception ex)
                     {
+                        CancelDeleteAndInsert(WmsDc);
+                        CancelUpdate(WmsDc);
+                        WmsDc.SubmitChanges();
+
                         if (ex.Message.IndexOf("牺牲品") > 0)
                         {
                             return RInfo("E0075");
@@ -1534,7 +1588,7 @@ namespace WMS.Controllers
                         else
                         {
                             return RInfo("E0076", ex.Message);
-                        }
+                        }                                                
                     }                 
                     return RSucc("成功", null, "S0222");
 

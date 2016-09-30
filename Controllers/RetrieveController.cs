@@ -514,7 +514,7 @@ namespace WMS.Controllers
 
                 //i(wmsno, "", System.DateTime.Now.ToString("yyyyMMddHHmmss.fff"), Request["rnd"], "12", LoginInfo.DefSavdptid);
             }
-            return RSucc("成功", null, "{{S: {0} }}");   //todo 编码
+            return RSucc("成功", null, "S0240");   //todo 编码
         }
 
         private ActionResult BokRetrieveP(String wmsno, String bllid, String bocino, String clsid, String checi, String gdsid, double qty)
@@ -1229,7 +1229,7 @@ namespace WMS.Controllers
                                             WmsDc.wms_cutgds.InsertOnSubmit(cutgds);
 
                                             dHasCutGds += cutgds.qty;
-
+                                           
                                             try
                                             {
                                                 WmsDc.SubmitChanges(System.Data.Linq.ConflictMode.FailOnFirstConflict);
@@ -1850,6 +1850,7 @@ namespace WMS.Controllers
                             }
                         }
                     }
+                    
                     WmsDc.wms_cang.InsertOnSubmit(sycang);
                     WmsDc.wms_cangdtl.InsertAllOnSubmit(lstsydtl);
                     

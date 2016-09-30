@@ -335,7 +335,8 @@ namespace WMS.Controllers
                           && dpts.Contains(e.dptid.Trim())
                           && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
                           && e.rcvdptid == rcvdptid
-                          && e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi
+                          //&& e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi
+                          && e5.busid.EndsWith(checi)
                           select new
                           {
                               e.wmsno,e.chkflg, e3.qu, e.wmsbllid,e.dptid, e.stkouno,e.bllid, stkot = e, e.stkotdtl, ckrdes = e7.empdes.Trim()
@@ -599,7 +600,8 @@ namespace WMS.Controllers
                       && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
                       && dpts.Contains(e.dptid.Trim())
                       && e.bllid == WMSConst.BLL_TYPE_DISPATCH
-                      && e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi
+                      //&& e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi
+                      && e5.busid.EndsWith(checi)
                       && Math.Round(e1.qty, 2, MidpointRounding.AwayFromZero) != 0
                       select new { e, e1, e2 };
             var arrqry = qry.ToArray();
@@ -675,7 +677,8 @@ namespace WMS.Controllers
                       && dpts.Contains(e.dptid.Trim())
                       && e.bllid == WMSConst.BLL_TYPE_DISPATCH
                       && (e1.bzflg == GetN() || e1.bzflg == null)
-                      && e5.busid.Trim().Substring(e5.busid.Trim().Length-1,1)==checi
+                      //&& e5.busid.Trim().Substring(e5.busid.Trim().Length-1,1)==checi
+                      && e5.busid.EndsWith(checi)
                       orderby e1.gdsid
                       group e1 by new { e.wmsno, e1.gdsid, e2.gdsdes, e2.spc, e2.bsepkg } into g
                       select new
@@ -742,8 +745,8 @@ namespace WMS.Controllers
                           && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
                           && dpts.Contains(e.dptid.Trim())
                           && e.bllid == WMSConst.BLL_TYPE_DISPATCH
-                          && e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi
-                          //&& (e1.bzflg == GetN() || e1.bzflg == null)                      
+                          //&& e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi                          
+                          && e5.busid.EndsWith(checi)
                           group e1 by new
                           {
                               e.wmsno,
@@ -868,8 +871,8 @@ namespace WMS.Controllers
                       && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
                       && dpts.Contains(e.dptid.Trim())
                       && e.bllid == WMSConst.BLL_TYPE_DISPATCH
-                      && e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi
-                      //&& (e.bzflg == GetN() || e.bzflg == null)                      
+                      //&& e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi
+                      && e5.busid.EndsWith(checi)
                       orderby e1.bzflg, e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1), e5.busid.Trim().Substring(0, 3),
                       Convert.ToInt32(e5.rcvdptid), e2.gdsid, e1.qty
                       select new

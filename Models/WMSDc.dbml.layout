@@ -446,5 +446,11 @@
         <elementListCompartment Id="d76c799b-f19f-4e17-9268-2aff30e567ba" absoluteBounds="7.015, 6.585, 1.9700000000000002, 1.0115458170572915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
+    <classShape Id="c6422e19-4b9d-41a2-bb66-9c9ca1a32fa5" absoluteBounds="3.375, 1.75, 2, 2.5266442871093751">
+      <DataClassMoniker Name="/WMSDcDataContext/wms_file_log" />
+      <nestedChildShapes>
+        <elementListCompartment Id="c8ed2907-7e32-4b66-bdd7-0c2b536d45ab" absoluteBounds="3.39, 2.21, 1.9700000000000002, 1.966644287109375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
   </nestedChildShapes>
 </ordesignerObjectsDiagram>

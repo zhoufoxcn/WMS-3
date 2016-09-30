@@ -12,6 +12,7 @@ using System.Web.Script.Serialization;
 using System.IO;
 using System.Text;
 using System.Data.Linq;
+using System.Collections.Specialized;
 
 namespace WMS.Controllers
 {
@@ -27,6 +28,13 @@ namespace WMS.Controllers
         protected string sLogReqAndRespFile = null;
         protected string sLogSqlFile = null;
         protected MemoryStream msLogSql = new MemoryStream();
+
+        //开始请求时间
+        protected DateTime dtReqStart;        
+        //结束请求时间
+        protected DateTime dtReqEnd;
+        //请求间隔时间
+        protected int iElapse;
 
         protected String Flg = "ny";
         public Char GetY()
@@ -301,47 +309,105 @@ namespace WMS.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            try
+            {
+                ExcuteSql("throw 50001,'1234',1");
+                return Content("d");
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.Message);
+            }
+        }
+
+        public bool ExcuteSql(string sql, params object[] param)
+        {
+            int iEffistdtl = WmsDc.ExecuteCommand(sql, param);
+            return !(iEffistdtl == 0);            
         }
 
         protected override void OnActionExecuted(ActionExecutedContext filterContext)
         //protected virtual void OnResultExecuted(ResultExecutedContext filterContext)
-        {                        
+        {
             //得到url
             //得到post params
             //得到返回值
-            if (!string.IsNullOrEmpty(sLogReqAndRespFile))
+            try
             {
+                WMSDcDataContext wmsdc1 = new WMSDcDataContext();
                 string sUrl = filterContext.HttpContext.Request.Url.PathAndQuery;
-                string sParamters = "";
-                foreach (string s in filterContext.HttpContext.Request.Form.Keys)
+                string sParamters = "?";
+                Dictionary<string, object> dicForm = new Dictionary<string, object>();
+                filterContext.HttpContext.Request.Form.CopyTo(dicForm);
+                string[] arr = (from e in dicForm
+                                select e.Key + "=" + e.Value).ToArray();
+                sUrl += "&" + string.Join("&", arr);
+
+                if (!string.IsNullOrEmpty(sLogReqAndRespFile))
                 {
-                    sParamters += s + "=" + filterContext.HttpContext.Request.Form[s] + "&";
+                    
+                    /*foreach (string s in filterContext.HttpContext.Request.Form.Keys)
+                    {
+                        sParamters += s + "=" + dicForm[s] + "&";
+                    }*/
+                    if (!string.IsNullOrEmpty(sParamters))
+                    {
+                        JavaScriptSerializer jss = new JavaScriptSerializer();
+                        ResultMessage rmnew = new ResultMessage();
+                        ResultMessage rmold = (ResultMessage)((JsonResult)filterContext.Result).Data;                        
+                        rmnew.ResultCode = rmold.ResultCode;
+                        rmnew.ResultDesc = rmold.ResultDesc;
+                        String sResult = jss.Serialize(rmnew);
+                        String sReqTime = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
+                        String sReqResp = "===============================================\r\n";
+                        string sColSplitChars = "||||";
+                        sReqResp += sReqTime + sColSplitChars + sUrl + sColSplitChars + sParamters + sColSplitChars + sResult + "\r\n";
+                        sReqResp += "===============================================\r\n";
+                        //System.IO.File.AppendAllText(sLogReqAndRespFile, sReqResp, Encoding.UTF8);
+
+                        dtReqEnd = DateTime.Now;
+                        iElapse = ((TimeSpan)(dtReqEnd - dtReqStart)).Milliseconds;
+
+                        wms_file_log flog = new wms_file_log();
+                        flog.actdat = sReqTime;
+                        flog.fname = sLogReqAndRespFile;
+                        flog.logUsr = UsrId;
+                        flog.elapse = iElapse;
+                        flog.result = sReqResp;
+                        flog.url = sUrl;
+                        flog.@params = sParamters;
+                        flog.uptdtm = DateTime.Now;
+                        wmsdc1.wms_file_log.InsertOnSubmit(flog);
+                        wmsdc1.SubmitChanges();
+                    }
                 }
-                if (!string.IsNullOrEmpty(sParamters))
+
+
+                //得到执行的sql语句，写入随机数文件中
+                if (WmsDc.Log != null)
                 {
-                    JavaScriptSerializer jss = new JavaScriptSerializer();
-                    String sResult = jss.Serialize(((JsonResult)filterContext.Result).Data);
-                    String sReqTime = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
-                    String sReqResp = "===============================================\r\n";
-                    string sColSplitChars = "||||";
-                    sReqResp += sReqTime + sColSplitChars + sUrl + sColSplitChars + sParamters + sColSplitChars + sResult + "\r\n";
-                    sReqResp += "===============================================\r\n";
-                    System.IO.File.AppendAllText(sLogReqAndRespFile, sReqResp, Encoding.UTF8);
+                    WmsDc.Log.Flush();
+                    msLogSql.Position = 0;
+                    StreamReader sr = new StreamReader(msLogSql);
+                    String slogSql = sr.ReadToEnd();
+                    //System.IO.File.AppendAllText(sLogSqlFile, slogSql, Encoding.UTF8);
+                    //WmsDc.Log.Close();    
+
+                    wms_file_log flog = new wms_file_log();
+                    flog.actdat = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
+                    flog.fname = sLogSqlFile;
+                    flog.logUsr = UsrId;
+                    flog.result = slogSql;
+                    flog.url = sUrl;
+                    flog.@params = sParamters;
+                    flog.uptdtm = DateTime.Now;
+                    wmsdc1.wms_file_log.InsertOnSubmit(flog);
+                    wmsdc1.SubmitChanges();
                 }
             }
-            
-            
-            //得到执行的sql语句，写入随机数文件中
-            if (WmsDc.Log != null)
+            catch (Exception ex)
             {
-                WmsDc.Log.Flush();
-                msLogSql.Position = 0;
-                StreamReader sr = new StreamReader(msLogSql);
-                String slogSql = sr.ReadToEnd();
-                System.IO.File.AppendAllText(sLogSqlFile, slogSql, Encoding.UTF8);
-                //WmsDc.Log.Close();                
-            }                        
+            }
         }
 
         /// <summary>
@@ -350,6 +416,11 @@ namespace WMS.Controllers
         /// <param name="requestContext"></param>
         private void Init(RequestContext requestContext)
         {
+            //0.初始化请求时间
+            iElapse = 0;
+            dtReqStart = DateTime.Now;            
+
+
             //1.初始化变量
             WmsDc = new WMSDcDataContext();
             sLogReqAndRespFile = sLogReqAndResDir + "/" + DateTime.Now.ToString("yyyyMMdd") + ".log";
@@ -580,6 +651,8 @@ namespace WMS.Controllers
             if (desc.IndexOf("牺牲品") > 0)
             {
                 code1 = ResultMessage.RESULTMESSAGE_DEALTHREAD;
+                CancelDeleteAndInsert(WmsDc);
+                CancelUpdate(WmsDc);
                 desc = "数据提交异常，请重新提交";
             }
             return ReturnResult(code, desc);
@@ -700,6 +773,31 @@ namespace WMS.Controllers
             Rm.ExtCode = code;
             return RReturnResult(ResultMessage.RESULTMESSAGE_INFO, desc);
         }
+
+        protected void CancelDeleteAndInsert(WMSDcDataContext dc)
+        {
+            ChangeSet ch = dc.GetChangeSet();
+
+            foreach (Object ins in ch.Inserts)
+            {
+                dc.GetTable(ins.GetType()).DeleteOnSubmit(ins);
+            }
+
+            foreach (Object del in ch.Deletes)
+            {
+                dc.GetTable(del.GetType()).InsertOnSubmit(del);
+            }
+        }
+
+        protected void CancelUpdate(WMSDcDataContext dc)
+        {
+            ChangeSet ch = dc.GetChangeSet();
+            foreach (Object up in ch.Updates)
+            {
+                dc.Refresh(RefreshMode.OverwriteCurrentValues, up);
+            }
+        }
+
         //返回错误信息
         /// <summary>
         /// 返回错误信息
@@ -718,6 +816,7 @@ namespace WMS.Controllers
             {
                 code1 = ResultMessage.RESULTMESSAGE_DEALTHREAD;
                 desc = "数据提交异常，请重新提交";
+                
             }
             return RReturnResult(code1, desc);
         }

@@ -33,6 +33,13 @@ namespace WMS.Controllers
 
         private bcd GetGdsid(String gdsid)
         {
+            var qry1 = from e in WmsDc.gds
+                       where e.gdsid == gdsid
+                       select e;
+            if (qry1.Count() <= 0)
+            {
+                return null;
+            }
             var qry = from e in WmsDc.gds
                       join e1 in WmsDc.bcd on e.gdsid equals e1.gdsid
                       where e.gdsid == gdsid
@@ -41,7 +48,11 @@ namespace WMS.Controllers
             var arrqry = qry.ToArray();
             if (arrqry.Length <= 0)
             {
-                return null;
+                bcd bcd = new bcd();
+                bcd.bcd1 = "";
+                bcd.bcd2 = "";
+                bcd.gdsid = gdsid.Trim();                
+                return bcd;
             }
             return arrqry[0];
         }

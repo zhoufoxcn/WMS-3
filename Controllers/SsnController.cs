@@ -393,29 +393,7 @@ namespace WMS.Controllers
             return null;
         }
 
-        protected void CancelDeleteAndInsert(WMSDcDataContext dc)
-        {
-            ChangeSet ch = dc.GetChangeSet();
-
-            foreach (Object ins in ch.Inserts)
-            {
-                dc.GetTable(ins.GetType()).DeleteOnSubmit(ins);
-            }
-
-            foreach (Object del in ch.Deletes)
-            {
-                dc.GetTable(del.GetType()).InsertOnSubmit(del);
-            }
-        }
-
-        protected void CancelUpdate(WMSDcDataContext dc)
-        {            
-            ChangeSet ch = dc.GetChangeSet();
-            foreach (Object up in ch.Updates)
-            {
-                dc.Refresh(RefreshMode.OverwriteCurrentValues, up);
-            }
-        }
+        
 
         /// <summary>
         /// 得到当天查询仓位未拣货的所有明细
@@ -1215,6 +1193,9 @@ namespace WMS.Controllers
                          WmsDc.wms_pkg on new { e.gdsid } equals new { e3.gdsid }
                                           into joinPkg
                      from e4 in joinPkg.DefaultIfEmpty()
+                     join e5 in WmsDc.wms_set on new { e.qu, setid = "006" } equals new { qu = e5.val1, e5.setid }
+                     where e5.isvld=='y' && (e5.val3==LoginInfo.DefSavdptid||e5.val3==LoginInfo.DefCsSavdptid)
+                     orderby e5.val2 descending, e.gdstype descending, e.vlddat, e.sqty
                      select new
                      {
                          e.bnd,
@@ -2147,9 +2128,7 @@ namespace WMS.Controllers
             {
                 try
                 {
-                    String filename = sLogDir + "/" + GetCurrentDay() + ".log";
-                    //string filename = Mdlid + "_" + RouteData.Values["action"] + "_" + GetCurrentDay() + "_" + LoginInfo.Usrid.Trim() + ".txt";
-                    //filename = Server.MapPath("/WMS") + "\\" + filename;
+                    /*String filename = sLogDir + "/" + GetCurrentDay() + ".log";                    
                     StreamWriter sw = null;
                     if (!System.IO.File.Exists(filename))
                     {
@@ -2163,6 +2142,8 @@ namespace WMS.Controllers
                     }
                     sw.WriteLine("[" + GetCurrentDate() + "]    " + desc + "\r\n");
                     sw.Close();
+                    */
+                    
                 }
                 catch (Exception ex)
                 {
@@ -3064,15 +3045,26 @@ namespace WMS.Controllers
         /// <returns></returns>
         public ActionResult GetBcdByGdsid(String gdsid)
         {
-            var qry = from e in WmsDc.bcd
-                      join e1 in WmsDc.gds on e.gdsid equals e1.gdsid
-                      where (e.gdsid == gdsid || e.bcd1 == gdsid)
-                      //&& dpts.Contains(e1.dptid.Trim())
-                      select e;
-            var arrqry = qry.ToArray();
-            if (arrqry.Length <= 0)
+            if (!WmsDc.gds.Where(e => e.gdsid == gdsid.Trim()).Any())
             {
                 return RNoData("N0201");
+            }
+            var qry = from e1 in WmsDc.gds
+                      join e in WmsDc.bcd on e1.gdsid equals e.gdsid                      
+                      where (e.gdsid == gdsid || e.bcd1 == gdsid)
+                      //&& dpts.Contains(e1.dptid.Trim())
+                      select e;            
+            var arrqry = qry.ToArray();
+
+            if (arrqry.Length <= 0)
+            {
+                bcd bcd = new bcd();
+                bcd.bcd1 = "";
+                bcd.bcd2 = "";
+                bcd.gdsid = gdsid;               
+                bcd[] bcds = new[]{bcd};
+                return RSucc("成功", bcds, "S0186");
+                //return RNoData("N0201");
             }
 
             return RSucc("成功", arrqry, "S0186");

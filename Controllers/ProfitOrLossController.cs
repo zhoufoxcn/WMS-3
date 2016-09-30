@@ -499,26 +499,8 @@ namespace WMS.Controllers
                 iDelCangMst111(mst);
                 //删除主单据
                 try
-                {
-                    //检查单号是否已经审核
-                    if (mst!=null && mst.chkflg == GetY())
-                    {
-                        return RInfo("I0207");
-                    }
-
+                {                    
                     WmsDc.SubmitChanges();
-
-                    if (iDtlCount > 1)
-                    {
-                        //修改主单时间戳
-                        WmsDc.Refresh(System.Data.Linq.RefreshMode.OverwriteCurrentValues, mst);
-                        string sql = @"update wms_cang_111 set bllid='111' where wmsno='" + mst.wmsno + "' and bllid='111' and udtdtm={0}";
-                        int iEff = WmsDc.ExecuteCommand(sql, mst.udtdtm);
-                        if (iEff == 0)
-                        {
-                            return RInfo("I0207");
-                        }
-                    }
 
                     scop.Complete();
                     return RSucc("成功", null, "S0100");

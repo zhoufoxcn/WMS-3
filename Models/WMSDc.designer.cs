@@ -22,7 +22,7 @@ namespace WMS.Models
 	using System;
 	
 	
-	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="test_newshop")]
+	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="newshop")]
 	public partial class WMSDcDataContext : System.Data.Linq.DataContext
 	{
 		
@@ -225,6 +225,9 @@ namespace WMS.Models
     partial void Insertwms_pkgbcd(wms_pkgbcd instance);
     partial void Updatewms_pkgbcd(wms_pkgbcd instance);
     partial void Deletewms_pkgbcd(wms_pkgbcd instance);
+    partial void Insertwms_file_log(wms_file_log instance);
+    partial void Updatewms_file_log(wms_file_log instance);
+    partial void Deletewms_file_log(wms_file_log instance);
     #endregion
 		
 		public WMSDcDataContext() : 
@@ -790,6 +793,14 @@ namespace WMS.Models
 			get
 			{
 				return this.GetTable<wms_pkgbcd>();
+			}
+		}
+		
+		public System.Data.Linq.Table<wms_file_log> wms_file_log
+		{
+			get
+			{
+				return this.GetTable<wms_file_log>();
 			}
 		}
 		
@@ -29531,6 +29542,260 @@ namespace WMS.Models
 					this._udtdtm = value;
 					this.SendPropertyChanged("udtdtm");
 					this.OnudtdtmChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.wms_file_log")]
+	public partial class wms_file_log : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _actid;
+		
+		private string _actdat;
+		
+		private string _fname;
+		
+		private string _logUsr;
+		
+		private string _url;
+		
+		private string _params;
+		
+		private string _result;
+		
+		private System.DateTime _uptdtm;
+		
+		private System.Nullable<int> _elapse;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnactidChanging(int value);
+    partial void OnactidChanged();
+    partial void OnactdatChanging(string value);
+    partial void OnactdatChanged();
+    partial void OnfnameChanging(string value);
+    partial void OnfnameChanged();
+    partial void OnlogUsrChanging(string value);
+    partial void OnlogUsrChanged();
+    partial void OnurlChanging(string value);
+    partial void OnurlChanged();
+    partial void OnparamsChanging(string value);
+    partial void OnparamsChanged();
+    partial void OnresultChanging(string value);
+    partial void OnresultChanged();
+    partial void OnuptdtmChanging(System.DateTime value);
+    partial void OnuptdtmChanged();
+    partial void OnelapseChanging(System.Nullable<int> value);
+    partial void OnelapseChanged();
+    #endregion
+		
+		public wms_file_log()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_actid", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int actid
+		{
+			get
+			{
+				return this._actid;
+			}
+			set
+			{
+				if ((this._actid != value))
+				{
+					this.OnactidChanging(value);
+					this.SendPropertyChanging();
+					this._actid = value;
+					this.SendPropertyChanged("actid");
+					this.OnactidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_actdat", DbType="VarChar(25)")]
+		public string actdat
+		{
+			get
+			{
+				return this._actdat;
+			}
+			set
+			{
+				if ((this._actdat != value))
+				{
+					this.OnactdatChanging(value);
+					this.SendPropertyChanging();
+					this._actdat = value;
+					this.SendPropertyChanged("actdat");
+					this.OnactdatChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_fname", DbType="VarChar(100)")]
+		public string fname
+		{
+			get
+			{
+				return this._fname;
+			}
+			set
+			{
+				if ((this._fname != value))
+				{
+					this.OnfnameChanging(value);
+					this.SendPropertyChanging();
+					this._fname = value;
+					this.SendPropertyChanged("fname");
+					this.OnfnameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_logUsr", DbType="VarChar(8)")]
+		public string logUsr
+		{
+			get
+			{
+				return this._logUsr;
+			}
+			set
+			{
+				if ((this._logUsr != value))
+				{
+					this.OnlogUsrChanging(value);
+					this.SendPropertyChanging();
+					this._logUsr = value;
+					this.SendPropertyChanged("logUsr");
+					this.OnlogUsrChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_url", DbType="VarChar(1000)")]
+		public string url
+		{
+			get
+			{
+				return this._url;
+			}
+			set
+			{
+				if ((this._url != value))
+				{
+					this.OnurlChanging(value);
+					this.SendPropertyChanging();
+					this._url = value;
+					this.SendPropertyChanged("url");
+					this.OnurlChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="params", Storage="_params", DbType="VarChar(1000)")]
+		public string @params
+		{
+			get
+			{
+				return this._params;
+			}
+			set
+			{
+				if ((this._params != value))
+				{
+					this.OnparamsChanging(value);
+					this.SendPropertyChanging();
+					this._params = value;
+					this.SendPropertyChanged("@params");
+					this.OnparamsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_result", DbType="VarChar(MAX)")]
+		public string result
+		{
+			get
+			{
+				return this._result;
+			}
+			set
+			{
+				if ((this._result != value))
+				{
+					this.OnresultChanging(value);
+					this.SendPropertyChanging();
+					this._result = value;
+					this.SendPropertyChanged("result");
+					this.OnresultChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_uptdtm", DbType="DateTime NOT NULL")]
+		public System.DateTime uptdtm
+		{
+			get
+			{
+				return this._uptdtm;
+			}
+			set
+			{
+				if ((this._uptdtm != value))
+				{
+					this.OnuptdtmChanging(value);
+					this.SendPropertyChanging();
+					this._uptdtm = value;
+					this.SendPropertyChanged("uptdtm");
+					this.OnuptdtmChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_elapse", DbType="Int")]
+		public System.Nullable<int> elapse
+		{
+			get
+			{
+				return this._elapse;
+			}
+			set
+			{
+				if ((this._elapse != value))
+				{
+					this.OnelapseChanging(value);
+					this.SendPropertyChanging();
+					this._elapse = value;
+					this.SendPropertyChanged("elapse");
+					this.OnelapseChanged();
 				}
 			}
 		}

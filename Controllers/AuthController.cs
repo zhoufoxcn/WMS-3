@@ -117,7 +117,11 @@ namespace WMS.Controllers
         /// <param name="UsrId"></param>
         /// <returns></returns>
         protected LoginInfo GetLoginInfoByUsrId(string UsrId)
-        {            
+        {
+            if (Session["GetLoginInfoByUsrId"] != null)
+            {
+                return (LoginInfo)Session["GetLoginInfoByUsrId"];
+            }
             //查询商品库            
             var qrydtapwrs = from a in WmsDc.dtapwr
                              join b in WmsDc.bizdep on a.dptid equals b.savdptid
@@ -270,6 +274,8 @@ namespace WMS.Controllers
             {
                 li = arrqry[0];                
             }
+
+            Session["GetLoginInfoByUsrId"] = li;
             return li;
         }        
 

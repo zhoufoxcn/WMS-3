@@ -387,11 +387,14 @@ namespace WMS.Controllers
 
                     //done: 判断是否已经上架单明细已经审核完毕，完毕后就直接审核整单
                     //明细表
-                    wms_cangdtl[] arrqryaldtl = GetCangDtl(wmsno)
+                    /**/                    
+                    int? isLasted = WmsDc.ExecuteQuery<int?>("select count(*) from wms_cangdtl with(updlock) where wmsno={0} and bllid={1} and bokflg={2}",
+                        wmsno, WMSConst.BLL_TYPE_UPBLL, GetN()).FirstOrDefault();
+                    if (isLasted==null || isLasted == 0)
+                    {
+                        wms_cangdtl[] arrqryaldtl = GetCangDtl(wmsno)
                                                 .Where(e => e.bokflg == GetN())
                                                 .ToArray();
-                    if (arrqryaldtl.Length == 0)
-                    {
                         // done: 判断盘点收货单有没有整单审核，提示不能上架                        
                         wms_bllmst bllmst = GetBllMst(wmsno);
                         if (bllmst == null)

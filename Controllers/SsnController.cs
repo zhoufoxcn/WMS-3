@@ -916,6 +916,11 @@ namespace WMS.Controllers
 
         /// <summary>
         /// 分区是否在生成拣货单
+        /// 
+        /// 周胖胖 2016/10/11 15:39:57
+        /// 退厂、仓位调整、报损才加
+        /// 其他都不加
+        /// 
         /// </summary>
         /// <param name="storeid"></param>
         /// <param name="qu"></param>

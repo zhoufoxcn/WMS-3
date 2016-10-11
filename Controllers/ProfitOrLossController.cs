@@ -238,13 +238,7 @@ namespace WMS.Controllers
             {
                 String[] barcode = barcodes.Split(',');
                 String qu = barcode[0].Substring(0, 2);
-                String savdptid = GetSavdptidByQu(qu);
-                //正在生成拣货单，请稍候重试
-                string quRetrv = qu;
-                if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
-                {
-                    return RInfo("I0182");
-                }
+                String savdptid = GetSavdptidByQu(qu);                
 
                 return MakeNewBllNo(savdptid, qu, WMSConst.BLL_TYPE_PROFITORLOSS, (bllno) =>
                 {
@@ -272,6 +266,17 @@ namespace WMS.Controllers
                         double? dqty = dtls[0].qty;
                         symbol = dqty != null && dqty >= 0 ? "+" : "-";
                     }
+
+                    //正在生成拣货单，请稍候重试
+                    if (mst.times.Trim() == "-")
+                    {
+                        string quRetrv = qu;
+                        if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                        {
+                            return RRInfo("I0182");
+                        }
+                    }
+
                     /*if (HasCkBll(qu, LoginInfo.Usrid, savdptid, symbol))
                     {
                         return RRInfo("I0441");
@@ -374,11 +379,15 @@ namespace WMS.Controllers
                 }
                 //检查是否有数据权限
                 wms_cang_111 mst = arrqrymst[0];
+                
                 //正在生成拣货单，请稍候重试
-                string quRetrv = mst.qu;
-                if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                if (mst.times.Trim() == "-")
                 {
-                    return RInfo("I0183");
+                    string quRetrv = mst.qu;
+                    if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                    {
+                        return RInfo("I0182");
+                    }
                 }
 
                 if (!qus.Contains(mst.qu.Trim()))
@@ -470,10 +479,13 @@ namespace WMS.Controllers
                 //检查是否有数据权限
                 wms_cang_111 mst = arrqrymst[0];
                 //正在生成拣货单，请稍候重试
-                string quRetrv = mst.qu;
-                if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                if (mst.times.Trim() == "-")
                 {
-                    return RInfo("I0187");
+                    string quRetrv = mst.qu;
+                    if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                    {
+                        return RInfo("I0187");
+                    }
                 }
 
                 if (!qus.Contains(mst.qu.Trim()))
@@ -554,11 +566,14 @@ namespace WMS.Controllers
                 }
                 //检查是否有数据权限
                 wms_cang_111 mst = arrqrymst[0];
-                //正在生成拣货单，请稍候重试
-                string quRetrv = mst.qu;
-                if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                //正在生成拣货单，请稍候重试 ,如果是报损
+                if (mst.times.Trim() == "-")
                 {
-                    return RInfo("I0192");
+                    string quRetrv = mst.qu;
+                    if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                    {
+                        return RInfo("I0192");
+                    }
                 }
 
                 if (!qus.Contains(mst.qu.Trim()))
@@ -794,10 +809,13 @@ namespace WMS.Controllers
                 WmsDc.wms_cangdtl_111.InsertOnSubmit(dtl);
 
                 //正在生成拣货单，请稍候重试
-                string quRetrv = mst.qu;
-                if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                if (mst.times.Trim() == "-")
                 {
-                    return RInfo("I0205");
+                    string quRetrv = mst.qu;
+                    if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                    {
+                        return RInfo("I0205");
+                    }
                 }
 
                 if (!qus.Contains(mst.qu))
@@ -926,10 +944,13 @@ namespace WMS.Controllers
                 //检查是否有数据权限
                 wms_cang_111 mst = arrqrymst[0];
                 //正在生成拣货单，请稍候重试
-                string quRetrv = mst.qu;
-                if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                if (mst.times.Trim() == "-")
                 {
-                    return RInfo("I0215");
+                    string quRetrv = mst.qu;
+                    if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
+                    {
+                        return RInfo("I0215");
+                    }
                 }
 
                 if (!qus.Contains(mst.qu.Trim()))

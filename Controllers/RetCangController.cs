@@ -235,12 +235,22 @@ namespace WMS.Controllers
                              && e.bllid == WMSConst.BLL_TYPE_RETCANG
                              select e;
                 var dlarrdtl = qrydtl.Where(w => gdsid.Contains(w.gdsid.Trim())).ToArray();
-                var qrymst = from e in WmsDc.wms_cang_109
+
+                var qrymst = WmsDc.ExecuteQuery<wms_cang_109>("select * from wms_cang_109 with(updlock) where bllid={0} and wmsno={1} and mkr={2}",
+                                        WMSConst.BLL_TYPE_RETCANG, wmsno, LoginInfo.Usrid);
+                /*var qrymst = from e in WmsDc.wms_cang_109
+                             where e.wmsno == bllno && e.bllid == WMSConst.BLL_TYPE_RETCANG
+                             && e.mkr == LoginInfo.Usrid
+                             && qus.Contains(e.qu.Trim())
+                             select e;*/
+                var arrqrymst = qrymst.Where(e => qus.Contains(e.qu.Trim())).ToArray();
+
+                /*var qrymst = from e in WmsDc.wms_cang_109
                              where e.wmsno == wmsno && e.bllid == WMSConst.BLL_TYPE_RETCANG
                              && e.mkr == LoginInfo.Usrid
                              && qus.Contains(e.qu.Trim())
                              select e;
-                var arrqrymst = qrymst.ToArray();
+                var arrqrymst = qrymst.ToArray();*/
                 if (arrqrymst.Length <= 0)
                 {
                     return RNoData("N0150");
@@ -250,7 +260,7 @@ namespace WMS.Controllers
                 //string quRetrv = mst.qu;
                 //if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
                 //{
-                //    return RInfo( "I0292" );
+                //    return RInfo("I0292");
                 //}
                 if (mst!=null && mst.chkflg == GetY())
                 {
@@ -268,12 +278,16 @@ namespace WMS.Controllers
                 }
                 try
                 {
+                    //下面注释这行影响效率，所以用加外键的方式处理此次的并发问题
+                    /*int iDtlCount = WmsDc.ExecuteQuery<int>("select count(*) from wms_cangdtl_109 with(xlock) where bllid={0} and wmsno={1}",
+                                            WMSConst.BLL_TYPE_RETCANG, wmsno).First();*/
                     WmsDc.wms_cangdtl_109.DeleteAllOnSubmit(dlarrdtl);
                     iDelCangDtl109(dlarrdtl, mst);
                     //查询明细删除后，是否已经没有明细，没有明细就删除主单据
-                    var arrqrydtl = qrydtl.ToArray();
-                    int iDtlCount = arrqrydtl.Length;
-                    if (iDtlCount <= 1)
+                    //var arrqrydtl = qrydtl.ToArray();
+                    //int iDtlCount = arrqrydtl.Length;
+                    int iDtlCount = qrydtl.Count();
+                    if (iDtlCount <= 0)
                     {
                         WmsDc.wms_cang_109.DeleteOnSubmit(mst);
                         iDelCangMst109(mst);
@@ -330,20 +344,31 @@ namespace WMS.Controllers
                                      select e;
                         var arrqrydtl = qrydtl.ToArray();
                         int iDtlCount = arrqrydtl.Count();
+
+                        var qrymst = WmsDc.ExecuteQuery<wms_cang_109>("select * from wms_cang_109 with(updlock) where bllid={0} and wmsno={1} and mkr={2}",
+                                        WMSConst.BLL_TYPE_RETCANG, s, LoginInfo.Usrid);
+                        /*var qrymst = from e in WmsDc.wms_cang_109
+                                     where e.wmsno == bllno && e.bllid == WMSConst.BLL_TYPE_RETCANG
+                                     && e.mkr == LoginInfo.Usrid
+                                     && qus.Contains(e.qu.Trim())
+                                     select e;*/
+                        var arrqrymst = qrymst.Where(e => qus.Contains(e.qu.Trim())).ToArray();
+
+                        /*
                         var qrymst = from e in WmsDc.wms_cang_109
                                      where e.wmsno == s && e.bllid == WMSConst.BLL_TYPE_RETCANG
                                      && qus.Contains(e.qu.Trim())
                                      && e.mkr == LoginInfo.Usrid
                                      select e;
-                        var arrqrymst = qrymst.ToArray();
-                        wms_cang_109 mst = qrymst.FirstOrDefault();
+                        var arrqrymst = qrymst.ToArray();*/
+                        wms_cang_109 mst = arrqrymst.FirstOrDefault();
                         if (mst != null)
                         {
                             ////正在生成拣货单，请稍候重试
                             //string quRetrv = mst.qu;
                             //if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
                             //{
-                            //    return RInfo( "I0295" );
+                            //    return RInfo("I0295");
                             //}
 
                             if (mst!=null && mst.chkflg == GetY())
@@ -373,7 +398,7 @@ namespace WMS.Controllers
                                 }
                                 WmsDc.SubmitChanges();
 
-                                if (iDtlCount > 1)
+                                /*if (iDtlCount > 1)
                                 {
                                     //修改主单时间戳
                                     string sql = @"update wms_cang_109 set bllid='109' where wmsno='" + mst.wmsno + "' and bllid='109' and udtdtm={0}";
@@ -382,7 +407,7 @@ namespace WMS.Controllers
                                     {
                                         return RInfo("I0207");
                                     }
-                                }
+                                }*/
 
                                 iDelCangDtl109(arrqrydtl, mst);
                                 iDelCangMst109(mst);
@@ -429,7 +454,7 @@ namespace WMS.Controllers
                 //string quRetrv = GetQuByDptid(dptid, LoginInfo.DefStoreid);
                 //if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
                 //{
-                //    return RInfo( "I0297" );
+                //    return RInfo("I0297");
                 //}
 
                 //检查是否有残损库权限
@@ -438,12 +463,14 @@ namespace WMS.Controllers
                     return RInfo("I0298");
                 }
 
-                var qrymst = from e in WmsDc.wms_cang_109
+                var qrymst = WmsDc.ExecuteQuery<wms_cang_109>("select * from wms_cang_109 with(updlock) where bllid={0} and wmsno={1} and mkr={2}",
+                                        WMSConst.BLL_TYPE_RETCANG, bllno, LoginInfo.Usrid);
+                /*var qrymst = from e in WmsDc.wms_cang_109
                              where e.wmsno == bllno && e.bllid == WMSConst.BLL_TYPE_RETCANG
                              && e.mkr == LoginInfo.Usrid
                              && qus.Contains(e.qu.Trim())
-                             select e;
-                var arrqrymst = qrymst.ToArray();
+                             select e;*/
+                var arrqrymst = qrymst.Where(e => qus.Contains(e.qu.Trim())).ToArray();
                 var qrydtl = from e in WmsDc.wms_cangdtl_109
                              where e.wmsno == bllno && e.bllid == WMSConst.BLL_TYPE_RETCANG
                              select e;
@@ -703,7 +730,7 @@ namespace WMS.Controllers
                         //string quRetrv = mst.qu;
                         //if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
                         //{
-                        //    return RRInfo( "I0311" );
+                        //    return RRInfo("I0311");
                         //}
                         mst.rcvdptid = dptid;
                         mst.times = "1";
@@ -797,7 +824,7 @@ namespace WMS.Controllers
                 //string quRetrv = GetQuByGdsid(gdsid, LoginInfo.DefStoreid).FirstOrDefault();
                 //if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
                 //{
-                //    return RInfo( "I0312" );
+                //    return RInfo("I0312");
                 //}
 
                 //拆分货号，数量
@@ -812,12 +839,22 @@ namespace WMS.Controllers
 
                 //查询返仓单
                 //查询返仓单主表
+                var qrymst = WmsDc.ExecuteQuery<wms_cang_109>("select * from wms_cang_109 with(updlock) where bllid={0} and wmsno={1} and mkr={2}",
+                                        WMSConst.BLL_TYPE_RETCANG, bllno, LoginInfo.Usrid);
+                /*var qrymst = from e in WmsDc.wms_cang_109
+                             where e.wmsno == bllno && e.bllid == WMSConst.BLL_TYPE_RETCANG
+                             && e.mkr == LoginInfo.Usrid
+                             && qus.Contains(e.qu.Trim())
+                             select e;*/
+                var arrqrymst = qrymst.Where(e => qus.Contains(e.qu.Trim())).ToArray();
+
+                /*
                 var qrymst = from e in WmsDc.wms_cang_109
                              where e.bllid == WMSConst.BLL_TYPE_RETCANG
                              && e.wmsno == bllno
                              && qus.Contains(e.qu.Trim())
                              select e;
-                var arrqrymst = qrymst.ToArray();
+                var arrqrymst = qrymst.ToArray();*/
                 if (arrqrymst.Length <= 0)
                 {
                     return RNoData("N0153");
@@ -962,12 +999,21 @@ namespace WMS.Controllers
 
                 //查询返仓单
                 //查询返仓单主表
+                var qrymst = WmsDc.ExecuteQuery<wms_cang_109>("select * from wms_cang_109 with(updlock) where bllid={0} and wmsno={1} and mkr={2}",
+                                        WMSConst.BLL_TYPE_RETCANG, bllno, LoginInfo.Usrid);
+                /*var qrymst = from e in WmsDc.wms_cang_109
+                             where e.wmsno == bllno && e.bllid == WMSConst.BLL_TYPE_RETCANG
+                             && e.mkr == LoginInfo.Usrid
+                             && qus.Contains(e.qu.Trim())
+                             select e;*/
+                var arrqrymst = qrymst.Where(e => qus.Contains(e.qu.Trim())).ToArray();
+                /*
                 var qrymst = from e in WmsDc.wms_cang_109
                              where e.bllid == WMSConst.BLL_TYPE_RETCANG
                              && e.wmsno == bllno
                              && qus.Contains(e.qu.Trim())
                              select e;
-                var arrqrymst = qrymst.ToArray();
+                var arrqrymst = qrymst.ToArray();*/
                 if (arrqrymst.Length <= 0)
                 {
                     return RNoData("N0155");
@@ -977,7 +1023,7 @@ namespace WMS.Controllers
                 //string quRetrv = mst.qu;
                 //if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
                 //{
-                //    return RInfo( "I0318" );
+                //    return RInfo("I0318");
                 //}
 
                 //查询返仓单明细

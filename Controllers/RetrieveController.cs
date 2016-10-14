@@ -911,7 +911,7 @@ namespace WMS.Controllers
                       && e.bllid == WMSConst.BLL_TYPE_DISPATCH
                       && e1.bzflg == 'n' && e1.qty > 0   //大于0的商品                      
                                     orderby (e5!=null && e5.busid!=null) ? e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) : e5.busid descending,
-                                    (e5 != null && e5.busid != null) ? e5.busid.Trim().Substring(0, 3) : e5.busid descending,
+                                    (e5 != null && e5.busid != null) ? e5.busid.Trim().Substring(0, e5.busid.Trim().Length - 1) : e5.busid descending,
                                     Convert.ToInt32(e.rcvdptid) descending, e1.qty descending
                                     select e1;
                     //double q = qrystkdtl.Sum(e => e.qty) - cutgds.qty;

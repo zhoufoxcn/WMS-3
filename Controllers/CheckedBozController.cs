@@ -144,7 +144,7 @@ namespace WMS.Controllers
                           //&& dpts.Contains(e.dptid.Trim())
                       && e.bllid == WMSConst.BLL_TYPE_DISPATCH
                       && e1.bzflg == 'n' && e1.qty > 0    //大于0的商品
-                      orderby e1.bzflg, e2.gdsid, e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1), e5.busid.Trim().Substring(0, 3),
+                      orderby e1.bzflg, e2.gdsid, e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1), e5.busid.Trim().Substring(0, e5.busid.Trim().Length - 1),
                       Convert.ToInt32(e5.rcvdptid), e1.qty
                       select e.rcvdptid.Trim();
             String shouldRcvdptid = qry.FirstOrDefault();
@@ -873,7 +873,7 @@ namespace WMS.Controllers
                       && e.bllid == WMSConst.BLL_TYPE_DISPATCH
                       //&& e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1) == checi
                       && e5.busid.EndsWith(checi)
-                      orderby e1.bzflg, e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1), e5.busid.Trim().Substring(0, 3),
+                      orderby e1.bzflg, e5.busid.Trim().Substring(e5.busid.Trim().Length - 1, 1), e5.busid.Trim().Substring(0, e5.busid.Trim().Length - 1),
                       Convert.ToInt32(e5.rcvdptid), e2.gdsid, e1.qty
                       select new
                       {
@@ -911,7 +911,7 @@ namespace WMS.Controllers
                     on new { e2.gdsid } equals new { e3.gdsid }
                     into joinPkg
                     from e4 in joinPkg.DefaultIfEmpty()
-                    orderby e2.bzflg, e2.busid.Trim().Substring(e2.busid.Trim().Length - 1, 1), e2.busid.Trim().Substring(0, 3),
+                    orderby e2.bzflg, e2.busid.Trim().Substring(e2.busid.Trim().Length - 1, 1), e2.busid.Trim().Substring(0, e5.busid.Trim().Length - 1),
                       Convert.ToInt32(e2.rcvdptid), e2.gdsid, e2.qty
                     select new
                     {

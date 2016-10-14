@@ -331,14 +331,7 @@ namespace WMS.Controllers
         public ActionResult DlRetPrvBllDtl(String wmsno, String gdsid, int rcdidx, String isMd)
         {
             using (TransactionScope scop = new TransactionScope(TransactionScopeOption.Required, options))
-            {
-                ////正在生成拣货单，请稍候重试
-                string quRetrv = GetQuByGdsid(gdsid, LoginInfo.DefStoreid).FirstOrDefault();
-                if (DoingRetrieve(LoginInfo.DefStoreid, quRetrv))
-                {
-                    return RInfo("I0336");
-                }
-
+            {                
                 isMd = String.IsNullOrEmpty(isMd) ? "n" : "y";
                 //检查单号是否存在
                 /*var qrymst = from e in WmsDc.wms_cang_110
@@ -361,6 +354,12 @@ namespace WMS.Controllers
                 }
                 //检查是否有数据权限
                 wms_cang_110 mst = arrqrymst[0];
+                ////正在生成拣货单，请稍候重试                
+                if (DoingRetrieve(LoginInfo.DefStoreid, mst.qu))
+                {
+                    return RInfo("I0336");
+                }
+
                 if (!qus.Contains(mst.qu.Trim()))
                 {
                     return RInfo("I0337");
@@ -745,9 +744,7 @@ namespace WMS.Controllers
             {
                 return RInfo( "I0356",gdsid ,barcode  );
             }
-            if (mst.times.Trim() == "-")
-            {                
-                //如果是报损，判断是否有库存                
+                           
                 //得到一个商品的库存数量
                 GdsInBarcode[] gb = GetAGdsQtyInBarcode(barcode, gdsid, gdstype)
                                     .Where(e => e.vlddat == vlddat.Trim() && e.bthno == bthno.Trim())
@@ -759,7 +756,7 @@ namespace WMS.Controllers
                 {
                     return RInfo( "I0357",qty ,ktqty );
                 }                
-            }   
+           
 
 
             //判断商品是否已经再单据里面

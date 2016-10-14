@@ -266,7 +266,7 @@ namespace WMS.Controllers
                         double? dqty = dtls[0].qty;
                         symbol = dqty != null && dqty >= 0 ? "+" : "-";
                     }
-
+                    mst.times = symbol;
                     //正在生成拣货单，请稍候重试
                     if (mst.times.Trim() == "-")
                     {
@@ -282,7 +282,7 @@ namespace WMS.Controllers
                         return RRInfo("I0441");
                     
                     }*/
-                    mst.times = symbol;
+                    
                     mst.lnkbocino = "";
                     mst.lnkbocidat = "";
                     mst.mkr = LoginInfo.Usrid;
@@ -504,14 +504,16 @@ namespace WMS.Controllers
                 }
 
 
-                //删除单据明细
-                WmsDc.wms_cangdtl_111.DeleteAllOnSubmit(arrqrydtl);
-                WmsDc.wms_cang_111.DeleteAllOnSubmit(arrqrymst);
-                iDelCangDtl111(arrqrydtl, mst);
-                iDelCangMst111(mst);
-                //删除主单据
+                
                 try
-                {                    
+                {
+                    //删除单据明细
+                    WmsDc.wms_cangdtl_111.DeleteAllOnSubmit(arrqrydtl);
+                    WmsDc.SubmitChanges();
+                    WmsDc.wms_cang_111.DeleteAllOnSubmit(arrqrymst);
+                    iDelCangDtl111(arrqrydtl, mst);
+                    iDelCangMst111(mst);
+                    //删除主单据
                     WmsDc.SubmitChanges();
 
                     scop.Complete();

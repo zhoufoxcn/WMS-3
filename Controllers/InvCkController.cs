@@ -422,11 +422,14 @@ namespace WMS.Controllers
         public ActionResult DlInvCkBllDtl(String wmsno, String gdsid, int rcdidx)
         {
             //检查单号是否存在
-            var qrymst = from e in WmsDc.wms_cang_105
+            /*var qrymst = from e in WmsDc.wms_cang_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
                          select e;
-            var arrqrymst = qrymst.ToArray();
+            var arrqrymst = qrymst.ToArray();*/
+            var arrqrymst = WmsDc
+                            .ExecuteQuery<wms_cang_105>("select * from wms_cang_105 with(updlock) where wmsno={0} and bllid={1}", wmsno, WMSConst.BLL_TYPE_INVENTORY_CHECK)
+                            .ToArray();
             var qrydtl = from e in WmsDc.wms_cangdtl_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
@@ -496,11 +499,14 @@ namespace WMS.Controllers
         public ActionResult MdInvCkBllDtl(String wmsno, String gdsid, int rcdidx, double qty)
         {
             //检查单号是否存在
-            var qrymst = from e in WmsDc.wms_cang_105
+            /*var qrymst = from e in WmsDc.wms_cang_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
                          select e;
-            var arrqrymst = qrymst.ToArray();
+            var arrqrymst = qrymst.ToArray();*/
+            var arrqrymst = WmsDc
+                            .ExecuteQuery<wms_cang_105>("select * from wms_cang_105 with(updlock) where wmsno={0} and bllid={1}", wmsno, WMSConst.BLL_TYPE_INVENTORY_CHECK)
+                            .ToArray();
             var qrydtl = from e in WmsDc.wms_cangdtl_105
                          where e.wmsno == wmsno
                          && e.gdsid == gdsid && e.rcdidx == rcdidx
@@ -566,11 +572,15 @@ namespace WMS.Controllers
         public ActionResult DlInvCkBll(String wmsno)
         {
             //检查单号是否存在
-            var qrymst = from e in WmsDc.wms_cang_105
+            /*var qrymst = from e in WmsDc.wms_cang_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
                          select e;
-            var arrqrymst = qrymst.ToArray();
+            var arrqrymst = qrymst.ToArray();*/
+            var arrqrymst = WmsDc
+                            .ExecuteQuery<wms_cang_105>("select * from wms_cang_105 with(updlock) where wmsno={0} and bllid={1}", wmsno, WMSConst.BLL_TYPE_INVENTORY_CHECK)
+                            .ToArray();
+
             var qrydtl = from e in WmsDc.wms_cangdtl_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
@@ -607,14 +617,17 @@ namespace WMS.Controllers
                     return RInfo( "I0151" );
                 }
             }
-            //删除单据明细
-            WmsDc.wms_cangdtl_105.DeleteAllOnSubmit(arrqrydtl);
-            WmsDc.wms_cang_105.DeleteAllOnSubmit(arrqrymst);
-            iDelCangDtl105(arrqrydtl, mst);
-            iDelCangMst105(mst);
-            //删除主单据
+            
             try
             {
+                //删除单据明细
+                WmsDc.wms_cangdtl_105.DeleteAllOnSubmit(arrqrydtl);
+                WmsDc.SubmitChanges();
+                WmsDc.wms_cang_105.DeleteAllOnSubmit(arrqrymst);
+                iDelCangDtl105(arrqrydtl, mst);
+                iDelCangMst105(mst);
+                //删除主单据
+
                 WmsDc.SubmitChanges();
 
                 return RSucc("成功", null, "S0082");
@@ -1115,11 +1128,14 @@ namespace WMS.Controllers
         public ActionResult CancelAdtDtl(String wmsno, String gdsid, int rcdidx)
         {
             //检查单号是否存在
-            var qrymst = from e in WmsDc.wms_cang_105
+            /*var qrymst = from e in WmsDc.wms_cang_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
                          select e;
-            var arrqrymst = qrymst.ToArray();
+            var arrqrymst = qrymst.ToArray();*/
+            var arrqrymst = WmsDc
+                            .ExecuteQuery<wms_cang_105>("select * from wms_cang_105 with(updlock) where wmsno={0} and bllid={1}", wmsno, WMSConst.BLL_TYPE_INVENTORY_CHECK)
+                            .ToArray();
             var qrydtl = from e in WmsDc.wms_cangdtl_105
                          where e.wmsno == wmsno
                          && e.gdsid == gdsid && e.rcdidx == rcdidx
@@ -1182,11 +1198,14 @@ namespace WMS.Controllers
         public ActionResult AdtInvChkDtl(String wmsno, String gdsid, int rcdidx, double? qty)
         {
             //检查单号是否存在
-            var qrymst = from e in WmsDc.wms_cang_105
+            /*var qrymst = from e in WmsDc.wms_cang_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
                          select e;
-            var arrqrymst = qrymst.ToArray();
+            var arrqrymst = qrymst.ToArray();*/
+            var arrqrymst = WmsDc
+                            .ExecuteQuery<wms_cang_105>("select * from wms_cang_105 with(updlock) where wmsno={0} and bllid={1}", wmsno, WMSConst.BLL_TYPE_INVENTORY_CHECK)
+                            .ToArray();
             var qrydtl = from e in WmsDc.wms_cangdtl_105
                          where e.wmsno == wmsno
                          && e.gdsid == gdsid && e.rcdidx == rcdidx
@@ -1256,11 +1275,14 @@ namespace WMS.Controllers
         {
             
             //检查单号是否存在
-            var qrymst = from e in WmsDc.wms_cang_105
+            /*var qrymst = from e in WmsDc.wms_cang_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
                          select e;
-            var arrqrymst = qrymst.ToArray();
+            var arrqrymst = qrymst.ToArray();*/
+            var arrqrymst = WmsDc
+                            .ExecuteQuery<wms_cang_105>("select * from wms_cang_105 with(updlock) where wmsno={0} and bllid={1}", wmsno, WMSConst.BLL_TYPE_INVENTORY_CHECK)
+                            .ToArray();
             var qrydtl = from e in WmsDc.wms_cangdtl_105
                          where e.wmsno == wmsno                         
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK

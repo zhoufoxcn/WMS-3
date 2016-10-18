@@ -229,13 +229,7 @@ namespace WMS.Controllers
         {
             using (TransactionScope scop = new TransactionScope(TransactionScopeOption.Required, options))
             {
-                String[] gdsid = gdsids.Split(',');
-                var qrydtl = from e in WmsDc.wms_cangdtl_109
-                             where e.wmsno == wmsno
-                             && e.bllid == WMSConst.BLL_TYPE_RETCANG
-                             select e;
-                var dlarrdtl = qrydtl.Where(w => gdsid.Contains(w.gdsid.Trim())).ToArray();
-
+                String[] gdsid = gdsids.Split(',');                
                 var qrymst = WmsDc.ExecuteQuery<wms_cang_109>("select * from wms_cang_109 with(updlock) where bllid={0} and wmsno={1} and mkr={2}",
                                         WMSConst.BLL_TYPE_RETCANG, wmsno, LoginInfo.Usrid);
                 /*var qrymst = from e in WmsDc.wms_cang_109
@@ -244,6 +238,12 @@ namespace WMS.Controllers
                              && qus.Contains(e.qu.Trim())
                              select e;*/
                 var arrqrymst = qrymst.Where(e => qus.Contains(e.qu.Trim())).ToArray();
+
+                var qrydtl = from e in WmsDc.wms_cangdtl_109
+                             where e.wmsno == wmsno
+                             && e.bllid == WMSConst.BLL_TYPE_RETCANG
+                             select e;
+                var dlarrdtl = qrydtl.Where(w => gdsid.Contains(w.gdsid.Trim())).ToArray();
 
                 /*var qrymst = from e in WmsDc.wms_cang_109
                              where e.wmsno == wmsno && e.bllid == WMSConst.BLL_TYPE_RETCANG
@@ -863,8 +863,8 @@ namespace WMS.Controllers
 
                 //查询返仓单明细
                 var qrydtl = from e in WmsDc.wms_cangdtl_109
-                             join e1 in qrymst on new { e.wmsno, e.bllid } equals new { e1.wmsno, e1.bllid }
-                             where e.gdsid == param[0].Gdsid
+                             join e1 in WmsDc.wms_cang_109 on new { e.wmsno, e.bllid } equals new { e1.wmsno, e1.bllid }
+                             where e.wmsno == bllno && e.bllid == WMSConst.BLL_TYPE_RETCANG && e.gdsid == param[0].Gdsid
                              select e;
                 var arrqrydtl = qrydtl.ToArray();
                 if (arrqrydtl.Length <= 0)
@@ -933,7 +933,10 @@ namespace WMS.Controllers
                 wms_cangdtl_109 mddtl = arrqrydtl[0];
                 mddtl.pkgqty = lstDtl[0].pkgqty;
                 mddtl.qty = lstDtl[0].qty;
-                mddtl.brfdtl = rsn;
+                if (!string.IsNullOrEmpty(rsn))
+                {
+                    mddtl.brfdtl = rsn;
+                }
                 mddtl.bokdat = GetCurrentDate();
 
                 /*WmsDc.wms_cangdtl_109.DeleteAllOnSubmit(arrqrydtl);
@@ -948,23 +951,24 @@ namespace WMS.Controllers
 
                 try
                 {
-                    WmsDc.Refresh(System.Data.Linq.RefreshMode.OverwriteCurrentValues, mst);
-                    //检查单号是否已经审核
-                    if (mst!=null && mst.chkflg == GetY())
-                    {
-                        return RInfo("I0207");
-                    }
+                    //WmsDc.Refresh(System.Data.Linq.RefreshMode.OverwriteCurrentValues, mst);
+                    ////检查单号是否已经审核
+                    //if (mst!=null && mst.chkflg == GetY())
+                    //{
+                    //    return RInfo("I0207");
+                    //}
+
+                    
+
+                    ////修改主单时间戳
+                    //string sql = @"update wms_cang_109 set bllid='109' where wmsno='" + mst.wmsno + "' and bllid='109' and udtdtm={0}";
+                    //int iEff = WmsDc.ExecuteCommand(sql, mst.udtdtm);
+                    //if (iEff == 0)
+                    //{
+                    //    return RInfo("I0207");
+                    //}
 
                     WmsDc.SubmitChanges();
-
-                    //修改主单时间戳
-                    string sql = @"update wms_cang_109 set bllid='109' where wmsno='" + mst.wmsno + "' and bllid='109' and udtdtm={0}";
-                    int iEff = WmsDc.ExecuteCommand(sql, mst.udtdtm);
-                    if (iEff == 0)
-                    {
-                        return RInfo("I0207");
-                    }
-
                     scop.Complete();
                     return RSucc("修改成功", null, "S0145");
                 }

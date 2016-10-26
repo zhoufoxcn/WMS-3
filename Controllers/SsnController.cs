@@ -430,8 +430,8 @@ namespace WMS.Controllers
                                  g.Key.bsepkg,
                                  g.Key.pkgdes,
                                  g.Key.cnvrto,
-                                 qty = g.Sum(ee => ee.qty),
-                                 preqty = g.Sum(ee => ee.preqty)
+                                 qty = Math.Round(g.Sum(ee => ee.qty),4, MidpointRounding.AwayFromZero),
+                                 preqty = (double?)Math.Round(g.Sum(ee => ee.preqty.Value), 4, MidpointRounding.AwayFromZero)
                              };
             //如果有单号就不管是不是当天的
             /*if (!string.IsNullOrEmpty(wmsno))

@@ -167,7 +167,8 @@ namespace WMS.Controllers
             {
                 return false;
             }
-            double dSumRtv = qryRtv.Sum(e => e.qty);
+            double dSumRtv = Math.Round(qryRtv.Sum(e => e.qty), 4);
+
 
             //得到该商品应播种的数量
             var qryBz = (from e in WmsDc.stkot

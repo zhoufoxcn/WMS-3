@@ -103,6 +103,10 @@ namespace WMS.Controllers
                           prvdes = e1.cusdes
                       };
             }
+            //明细全部审核了就不返回主单了
+            qry = from e in qry
+                  where (from e1 in WmsDc.wms_cangdtl where e.wmsno==e1.wmsno && e.bllid==e1.bllid && e1.bokflg==GetN()&& e1.qty>0 select 1).Any()
+                  select e;
 
             var arrqry = qry.ToArray();
             if(arrqry.Length<=0){
@@ -626,7 +630,7 @@ namespace WMS.Controllers
                              
                 var arrdtl = qrydtl.ToArray();
                 //得到拣货的差异数
-                double diff = qrydtl1.Where(e => e.bokflg == 'n').Sum(e => e.qty) - qty;
+                double diff = Math.Round(qrydtl1.Where(e => e.bokflg == 'n').Sum(e => e.qty), 4, MidpointRounding.AwayFromZero) - qty;
                 if (qrydtl1.Where(e => e.bokflg == 'y').Any())
                 {
                     if (diff < 0)

@@ -165,10 +165,10 @@ namespace WMS.Controllers
                           e.chkflg,
                           e.chkdat,
                           e.brief, 
-                          e1.prvdes,
-                          dtls = (from edtl in WmsDc.wms_cangdtl_111
+                          e1.prvdes/*,
+                          dtls = (from edtl in WmsDc.wms_cangdtl_110
                                   join gd in WmsDc.gds on edtl.gdsid equals gd.gdsid
-                                  where edtl.wmsno == e.wmsno && edtl.bllid == WMSConst.BLL_TYPE_PROFITORLOSS
+                                  where edtl.wmsno == e.wmsno && edtl.bllid == WMSConst.BLL_TYPE_RETPRV
                                   select new
                                   {
                                       edtl.wmsno,
@@ -192,7 +192,7 @@ namespace WMS.Controllers
                                       gd.gdsdes,
                                       gd.spc,
                                       gd.bsepkg
-                                  }).ToArray()
+                                  }).ToArray()*/
                       };
             var arrqry = qry.ToArray();
             if (arrqry.Length <= 0)

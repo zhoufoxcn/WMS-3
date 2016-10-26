@@ -449,6 +449,10 @@ namespace WMS.Controllers
             //{
             //    return RInfo( "I0140" );
             //}
+            if (mst.mkr.Trim() != LoginInfo.Usrid.Trim())
+            {
+                return RInfo("E0080");
+            }
             if (!qus.Contains(mst.qu.Trim()))
             {
                 return RInfo( "I0141" );
@@ -522,7 +526,10 @@ namespace WMS.Controllers
             //检查是否有数据权限
             wms_cang_105 mst = arrqrymst[0];
 
-            
+            if (mst.mkr.Trim() != LoginInfo.Usrid.Trim())
+            {
+                return RInfo("E0081");
+            }
 
             ////正在生成拣货单，请稍候重试
             //string quRetrv = mst.qu;
@@ -599,7 +606,10 @@ namespace WMS.Controllers
             //{
             //    return RInfo( "I0148" );
             //}
-
+            if (mst.mkr.Trim() != LoginInfo.Usrid.Trim())
+            {
+                return RInfo("E0082");
+            }
             if (!qus.Contains(mst.qu.Trim()))
             {
                 return RInfo( "I0149" );
@@ -649,6 +659,10 @@ namespace WMS.Controllers
         [PWR(Pwrid = WMSConst.WMS_BACK_盘点制单, pwrdes = "盘点制单")]
         public ActionResult InstInvCkBll(String wmsno, String barcodes, String gdsids, String gdstypes, String bthnos, String vlddats, String qtys)
         {
+            var arrqrymst = WmsDc
+                            .ExecuteQuery<wms_cang_105>("select * from wms_cang_105 with(updlock) where wmsno={0} and bllid={1} and times='2'", wmsno, WMSConst.BLL_TYPE_INVENTORY_CHECK)
+                            .ToArray();
+
             //拆分参数
             //检查并创建明细
             JsonResult jr = (JsonResult)_MakeParam(wmsno, barcodes, gdsids, gdstypes, bthnos, vlddats, qtys);
@@ -659,12 +673,12 @@ namespace WMS.Controllers
             }            
 
             //检查单号是否存在
-            var qrymst = from e in WmsDc.wms_cang_105
+            /*var qrymst = from e in WmsDc.wms_cang_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
                          && e.times == "2"
                          select e;
-            var arrqrymst = qrymst.ToArray();
+            var arrqrymst = qrymst.ToArray();*/
             var qrydtl = from e in WmsDc.wms_cangdtl_105
                          where e.wmsno == wmsno
                          && e.bllid == WMSConst.BLL_TYPE_INVENTORY_CHECK
@@ -684,7 +698,10 @@ namespace WMS.Controllers
             //    return RInfo( "I0152" );
             //}
 
-            
+            if (mst.mkr.Trim() != LoginInfo.Usrid.Trim())
+            {
+                return RInfo("E0083");
+            }
             if (!qus.Contains(mst.qu.Trim()))
             {
                 return RInfo( "I0153" );
@@ -706,6 +723,21 @@ namespace WMS.Controllers
             if (arrqrygrp.Length > 0)
             {
                 var g = arrqrygrp[0];
+                /*10:03:58
+刘启杰 2016/10/24 10:03:58
+在增加第一条记录的时候如果失败就把主单删了
+
+刘启杰 2016/10/24 10:04:10
+免得有空单
+
+刘启杰 2016/10/24 10:04:56
+我这边删除 还不是提交到后台做 
+空单你那边就控制了 我就不用再提交了*/
+                if (arrqrydtl.Length == 0)
+                {
+                    WmsDc.wms_cang_105.DeleteOnSubmit(mst);
+                    WmsDc.SubmitChanges();
+                }
                 return RInfo("I0155", g.gdsid, g.gdstype);                
             }
 
@@ -721,6 +753,21 @@ namespace WMS.Controllers
                                       select e.val1.Trim()).FirstOrDefault();
                     if (hasPwrInQu==null || hasPwrInQu != mst.qu)
                     {
+                        /*10:03:58
+刘启杰 2016/10/24 10:03:58
+在增加第一条记录的时候如果失败就把主单删了
+
+刘启杰 2016/10/24 10:04:10
+免得有空单
+
+刘启杰 2016/10/24 10:04:56
+我这边删除 还不是提交到后台做 
+空单你那边就控制了 我就不用再提交了*/
+                        if (arrqrydtl.Length == 0)
+                        {
+                            WmsDc.wms_cang_105.DeleteOnSubmit(mst);
+                            WmsDc.SubmitChanges();
+                        }
                         return RInfo("I0488");
                     }
                 }
@@ -732,10 +779,10 @@ namespace WMS.Controllers
                 }
                 d.oldbarcode = "";
             }
-
-            WmsDc.wms_cangdtl_105.InsertAllOnSubmit(newdtl);
+            
             try
             {
+                WmsDc.wms_cangdtl_105.InsertAllOnSubmit(newdtl);
                 WmsDc.SubmitChanges();
                 return RSucc("成功", newdtl, "S0083");
             }
@@ -1162,6 +1209,10 @@ namespace WMS.Controllers
             }*/
             // 判断有无重新复核的权限
             // 检查单号是否已经审核
+            if (mst.mkr.Trim() != LoginInfo.Usrid.Trim())
+            {
+                return RInfo("E0084");
+            }
             if (mst!=null && mst.chkflg == GetY())
             {
                 return RInfo( "I0163" );
@@ -1232,6 +1283,10 @@ namespace WMS.Controllers
             }*/
             // 判断有无重新复核的权限
             // 检查单号是否已经审核
+            if (mst.mkr.Trim() != LoginInfo.Usrid.Trim())
+            {
+                return RInfo("E0085");
+            }
             if ( mst.chkflg == GetY())
             {
                 return RInfo( "I0166" );
@@ -1306,6 +1361,12 @@ namespace WMS.Controllers
             {
                 return RInfo( "I0169" );
             }*/
+
+            if (mst.mkr.Trim() != LoginInfo.Usrid.Trim())
+            {
+                return RInfo("E0086");
+            }
+
             //检查单号是否已经审核
             if (mst!=null && mst.chkflg == GetY())
             {

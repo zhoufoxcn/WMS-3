@@ -184,7 +184,35 @@ namespace WMS.Controllers
              * 8.插入sftdtl表
              */
 
+            #region 计算出有多少调入不同区的部门，并循环得到单号
+            String fscprdid = GetCurrentFscprdid();
 
+            string sSqlCnt = @"declare @wmsno varchar(50)
+                    set @wmsno={0}
+                    select count(*) from (
+	                    select a.wmsno, a.bllid, rcdidx, b.dptid, c.qu from wms_blldtl(updlock) a
+	                    inner join gds b on a.gdsid=b.gdsid 
+	                    inner join wms_bllmst(updlock) c on a.wmsno=c.wmsno and a.bllid=c.bllid
+	                    where a.bllid='108' and a.wmsno=@wmsno
+                    ) t 
+                    inner join (
+	                    select wmsno, bllid, rcdidxtp, rcdidx, b.dptid, a.qu from wms_blltp(updlock) a
+	                    inner join gds b on a.gdsid=b.gdsid where bllid='108' and wmsno=@wmsno
+                    ) t1 on t.wmsno=t1.wmsno and t.bllid=t1.bllid and t.rcdidx=t1.rcdidx
+                    where t.qu<>t1.qu
+                    group by t.wmsno, t.bllid, t.dptid, t1.dptid";
+            int iCnt = WmsDc.ExecuteQuery<int>(sSqlCnt, wmsno).FirstOrDefault();
+            List<string> lstBllno = new List<string>();
+            for (int i = 0; i < iCnt; i++)
+            {
+                string sABllno = null;
+                WmsDc.get_bllno(fscprdid, "01", "002", ref sABllno);
+                if (!string.IsNullOrEmpty(sABllno))
+                {
+                    lstBllno.Add(sABllno);
+                }
+            }
+            #endregion 
 
             using (TransactionScope scop = new TransactionScope(TransactionScopeOption.Required, options))
             //using (TransactionScope scop = new TransactionScope())
@@ -570,18 +598,18 @@ namespace WMS.Controllers
                                       newdptdes = e1.dptdes,
                                       newbarcode = e1.barcode,
                                       newqty = e1.qty,
-                                      newqu = e1.qu
+                                      newqu = e1.qu  //
                                   }).ToArray();
                 // 如果有调出调入分区不一致的单据就生产调拨单
                 if (lnkDtlsTps.Length > 0)
                 {
                     // 调拨单单号            
                     String stkinno = null;
-                    String adptid = null;
-                    String fscprdid = GetCurrentFscprdid();
+                    String adptid = null;                    
                     String bllid = "112";
                     stkin sin = null;
                     int _i = 1;
+                    int _iBllnoIdx = 0;
 
                     // 对这些分区不一致的商品，生产经销调拨单（单据类型：112）
                     foreach (var dp in lnkDtlsTps)
@@ -593,12 +621,18 @@ namespace WMS.Controllers
                         }*/
                         //判断aqu分区是否有null,为null就为改去分配单号
                         if (adptid == null || adptid != dp.newdptid)
-                        {
+                        {                            
                             // 序号初始化
                             _i = 1;
                             // 得到单号
                             adptid = dp.newdptid;
-                            WmsDc.get_bllno(fscprdid, "01", "002", ref stkinno);
+                            //如果分配的单号比需要的索引小，表示分配的单号不全（可能是并发导致明细增加，导致单号不足)
+                            if ((lstBllno.Count - 1) < _iBllnoIdx)
+                            {
+                                return RInfo("I0508");
+                            }
+                            stkinno = lstBllno[_iBllnoIdx];
+                            //WmsDc.get_bllno(fscprdid, "01", "002", ref stkinno);
                             //stkinno = WmsDc.get_wms_sy_bllno(fscprdid, dp.newdptid, dp.newsavdptid.Trim()).FirstOrDefault().Column1;
                             // 生成主单据
                             #region 生成主单
@@ -657,6 +691,9 @@ namespace WMS.Controllers
                             WmsDc.sftdtl.InsertOnSubmit(sdtl);
                             
                             #endregion 插入sftdtl表
+
+                            //单号索引加1个
+                            _iBllnoIdx++;
                         }
                         //插入明细单据
                         #region 插入明细单据
@@ -1607,7 +1644,8 @@ namespace WMS.Controllers
                 int iArrDtlCnt = qrydtl.Count();
 
  
-                arrqrytpdtl[0].barcode = barcode.Trim();                
+                arrqrytpdtl[0].barcode = barcode.Trim();
+                arrqrytpdtl[0].qu = GetQuByBarcode(barcode);                
                 arrqrytpdtl[0].qty = qty;
                 arrqrytpdtl[0].bokdat = GetCurrentDate();
 

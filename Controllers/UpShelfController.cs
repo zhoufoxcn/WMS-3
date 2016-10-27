@@ -566,6 +566,7 @@ namespace WMS.Controllers
                                  && e.bthno == gdsbs.bthno
                                  && e.vlddat == gdsbs.vlddat
                                  //&& e.prvid == gdsbs.prvid
+                                 && e.savdptid == gdsbs.savdptid
                                  && e.qu == cw.qu.Trim()
                                  select e;
                 var arrqrycwgdsbs = qrycwgdsbs.ToArray();

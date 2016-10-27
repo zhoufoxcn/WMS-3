@@ -334,8 +334,9 @@ namespace WMS.Controllers
                       into joinBcd
                       from e3 in joinBcd.DefaultIfEmpty()
                       where e.barcode == barcode
-                      && e.gdsid == gdsid && e.gdstype == gdstype      
-                      && e.qty>0
+                      && e.gdsid == gdsid && e.gdstype == gdstype
+                      && e.qty > 0
+                      && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
                       //&& dpts.Contains(e1.dptid.Trim())                                           
                       group new { e, e1, e3 } by new { e.savdptid, e.qu, e.barcode, e.gdsid, e.gdstype, e.bthno, e.vlddat, e1.gdsdes, e1.spc, e1.bsepkg, e3.bcd1, e1.dptid } into g
                       select new
@@ -522,6 +523,7 @@ namespace WMS.Controllers
                       where e.barcode == barcode
                       && e.qu == e.barcode.Substring(0,2)
                       && e.qty>0
+                      && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
                       //&& dpts.Contains(e1.dptid.Trim())
                       group new { e, e1, e3 } by new { e.savdptid, e.qu, e.barcode, e.gdsid, e.gdstype, e.bthno, e.vlddat, e1.gdsdes, e1.spc, e1.bsepkg, e3.bcd1 } into g
                       select new
@@ -598,6 +600,7 @@ namespace WMS.Controllers
                       && e.qu == e.barcode.Substring(0, 2)
                       && e.qty>0
                       //&& dpts.Contains(e1.dptid.Trim())
+                      && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
                       group new { e, e1, e3 } by new { e.savdptid, e.qu, e.barcode, e.gdsid, e.gdstype, e.bthno, e.vlddat, e1.gdsdes, e1.spc, e1.bsepkg, e3.bcd1 } into g
                       select new
                       {
@@ -1073,6 +1076,7 @@ namespace WMS.Controllers
                         from e3 in joinBcd.DefaultIfEmpty()
                         where e.gdsid == gdsid && (e.savdptid == LoginInfo.DefCsSavdptid)
                         && e.qty>0
+                        && (e.savdptid == LoginInfo.DefSavdptid || e.savdptid == LoginInfo.DefCsSavdptid)
                         group new { e, e1, e3 } by new { e.savdptid, e.qu, e.barcode, e.gdsid, e.gdstype, e1.gdsdes, e1.spc, e1.bsepkg, e3.bcd1, e.vlddat, e.bthno } into g
                         select new
                         {
@@ -1970,6 +1974,7 @@ namespace WMS.Controllers
                              cwqty = (from cw in WmsDc.wms_cwgdsbs
                                       where cw.barcode == e4.barcode
                                       && cw.gdsid == e4.gdsid && cw.gdstype == e4.gdstype
+                                      && (cw.savdptid == LoginInfo.DefSavdptid || cw.savdptid == LoginInfo.DefCsSavdptid)
                                       group cw by cw.barcode into g
                                       select g.Sum(c => c.qty)).FirstOrDefault(),
                              bkremp = e1.empdes,
@@ -2086,6 +2091,7 @@ namespace WMS.Controllers
                              cwqty = (from cw in WmsDc.wms_cwgdsbs
                                       where cw.barcode == e4.barcode
                                       && cw.gdsid == e4.gdsid && cw.gdstype == e4.gdstype
+                                      && (cw.savdptid == LoginInfo.DefSavdptid ||cw.savdptid == LoginInfo.DefCsSavdptid)
                                       group cw by cw.barcode into g
                                       select g.Sum(c => c.qty)).FirstOrDefault(),
                              bkremp = e1.empdes,

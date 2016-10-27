@@ -177,7 +177,7 @@ namespace WMS.Controllers
             }
             //明细全部审核了就不返回主单了
             qry = from e in qry
-                  where (from e1 in WmsDc.wms_cangdtl where e.wmsno == e1.wmsno && e.bllid == e1.bllid && e1.bokflg == GetN() && e1.qty > 0 select 1).Any()
+                  where (from e1 in WmsDc.wms_cangdtl_115 where e.wmsno == e1.wmsno && e.bllid == e1.bllid && e1.bokflg == GetN() && e1.qty > 0 select 1).Any()
                   select e;
 
             var arrqry = qry.Distinct().ToArray();

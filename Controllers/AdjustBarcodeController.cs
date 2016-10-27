@@ -189,19 +189,22 @@ namespace WMS.Controllers
 
             string sSqlCnt = @"declare @wmsno varchar(50)
                     set @wmsno={0}
-                    select count(*) from (
-	                    select a.wmsno, a.bllid, rcdidx, b.dptid, c.qu from wms_blldtl(updlock) a
-	                    inner join gds b on a.gdsid=b.gdsid 
-	                    inner join wms_bllmst(updlock) c on a.wmsno=c.wmsno and a.bllid=c.bllid
-	                    where a.bllid='108' and a.wmsno=@wmsno
-                    ) t 
-                    inner join (
-	                    select wmsno, bllid, rcdidxtp, rcdidx, b.dptid, a.qu from wms_blltp(updlock) a
-	                    inner join gds b on a.gdsid=b.gdsid where bllid='108' and wmsno=@wmsno
-                    ) t1 on t.wmsno=t1.wmsno and t.bllid=t1.bllid and t.rcdidx=t1.rcdidx
-                    where t.qu<>t1.qu
-                    group by t.wmsno, t.bllid, t.dptid, t1.dptid";
-            int iCnt = WmsDc.ExecuteQuery<int>(sSqlCnt, wmsno).FirstOrDefault();
+                    select sum(bllnoqty) from (
+                        select 1 bllnoqty from (
+	                        select a.wmsno, a.bllid, rcdidx, b.dptid, c.qu from wms_blldtl(updlock) a
+	                        inner join gds b on a.gdsid=b.gdsid 
+	                        inner join wms_bllmst(updlock) c on a.wmsno=c.wmsno and a.bllid=c.bllid
+	                        where a.bllid='108' and a.wmsno=@wmsno
+                        ) t 
+                        inner join (
+	                        select wmsno, bllid, rcdidxtp, rcdidx, b.dptid, a.qu from wms_blltp(updlock) a
+	                        inner join gds b on a.gdsid=b.gdsid where bllid='108' and wmsno=@wmsno
+                        ) t1 on t.wmsno=t1.wmsno and t.bllid=t1.bllid and t.rcdidx=t1.rcdidx
+                        where t.qu<>t1.qu
+                        group by t.wmsno, t.bllid, t.dptid, t1.dptid
+                    ) t";
+            int? iCnt1 = WmsDc.ExecuteQuery<int?>(sSqlCnt, wmsno).FirstOrDefault();
+            int iCnt = iCnt1==null?0:iCnt1.Value;
             List<string> lstBllno = new List<string>();
             for (int i = 0; i < iCnt; i++)
             {
